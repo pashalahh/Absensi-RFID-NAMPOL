@@ -4,6 +4,9 @@
  */
 package objects;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  *
  * @author LENOVO
@@ -11,15 +14,15 @@ package objects;
 public class logabsensi {
     private int idLog;
     private String uidRfid;
-    private String waktu;
-    private String tanggal;
+    private LocalDateTime waktu;
+    private LocalDate tanggal;
     private String nama;
     private String status;
 
     public logabsensi() {
     }
 
-    public logabsensi(int idLog, String uidRfid, String waktu, String tanggal, String nama, String status) {
+    public logabsensi(int idLog, String uidRfid, LocalDateTime waktu, LocalDate tanggal, String nama, String status) {
         this.idLog = idLog;
         this.uidRfid = uidRfid;
         this.waktu = waktu;
@@ -57,19 +60,19 @@ public class logabsensi {
         this.uidRfid = uidRfid;
     }
 
-    public String getWaktu() {
+    public LocalDateTime getWaktu() {
         return waktu;
     }
 
-    public void setWaktu(String waktu) {
+    public void setWaktu(LocalDateTime waktu) {
         this.waktu = waktu;
     }
 
-    public String getTanggal() {
+    public LocalDate getTanggal() {
         return tanggal;
     }
 
-    public void setTanggal(String tanggal) {
+    public void setTanggal(LocalDate tanggal) {
         this.tanggal = tanggal;
     }
 
