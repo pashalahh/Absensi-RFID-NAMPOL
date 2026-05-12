@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class logabsensi {
     private int idLog;
     private String uidRfid;
+
     private LocalDateTime waktu;
     private LocalDate tanggal;
     private String nama;
@@ -22,7 +23,9 @@ public class logabsensi {
     public logabsensi() {
     }
 
+
     public logabsensi(int idLog, String uidRfid, LocalDateTime waktu, LocalDate tanggal, String nama, String status) {
+
         this.idLog = idLog;
         this.uidRfid = uidRfid;
         this.waktu = waktu;
@@ -60,6 +63,7 @@ public class logabsensi {
         this.uidRfid = uidRfid;
     }
 
+
     public LocalDateTime getWaktu() {
         return waktu;
     }
@@ -73,8 +77,7 @@ public class logabsensi {
     }
 
     public void setTanggal(LocalDate tanggal) {
-        this.tanggal = tanggal;
-    }
+
 
     public String getNama() {
         return nama;
