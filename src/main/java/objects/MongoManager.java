@@ -19,21 +19,25 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 public class MongoManager {
     private static MongoClient mongoClient;
     private static final String database = "SEMANGGI";
+    private static CodecRegistry pojoCodecRegistry; // Simpan registry sebagai static
 
     public static MongoDatabase getDatabase() {
-        if (mongoClient == null) {
-            // Konfigurasi CodecRegistry untuk pemetaan POJO otomatis (Standard Industry)
+        // 1. Konfigurasi CodecRegistry untuk pemetaan POJO otomatis (Standard Industry)
             CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
                 MongoClientSettings.getDefaultCodecRegistry(),
                 CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
             );
-
-            // Inisiasi koneksi ke MongoDB Localhost (Driver 5.0.0)
-            mongoClient = MongoClients.create("mongodb://localhost:27017");
             
-            // Mengembalikan database dengan registry yang sudah dikonfigurasi
-            return mongoClient.getDatabase(database).withCodecRegistry(pojoCodecRegistry);
-        }
-        return mongoClient.getDatabase(database);
-    }
+            // 2. Terapkan registry tersebut ke pengaturan MongoClient
+            MongoClientSettings settings = MongoClientSettings.builder()
+            // Ganti URI sesuai dengan koneksi database Anda
+            .applyConnectionString(new com.mongodb.ConnectionString("mongodb://localhost:27017")) 
+            .codecRegistry(pojoCodecRegistry) // Masukkan codec di sini!
+            .build();
+            
+            // 3. Buat MongoClient dan Database menggunakan pengaturan tersebut
+            mongoClient = MongoClients.create(settings);
+            MongoDatabase Database = mongoClient.getDatabase(database);
+            return Database; 
+    }   
 }
