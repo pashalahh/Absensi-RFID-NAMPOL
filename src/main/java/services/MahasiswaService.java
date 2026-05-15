@@ -53,7 +53,7 @@ public class MahasiswaService {
     /**
      * 2. READ (All): Fungsi untuk mengambil semua data karyawan [5], [6]
      */
-    public void tampilkanDaftarKaryawan() {
+    public void tampilkanDaftarMahasiswa() {
         List<mahasiswa> daftar = DAO.findAll();
         System.out.println("--- Daftar Mahasiswa ---");
         for (mahasiswa m : daftar) {
@@ -236,6 +236,6 @@ public class MahasiswaService {
         Bson filter = Filters.eq("nimMahasiswa", idK);
         DAO.delete(filter); // Menggunakan deleteOne [6]
         Mahasiswa.showData("");
-        JOptionPane.showMessageDialog(null, "Data karyawan berhasil dihapus.");
+        JOptionPane.showMessageDialog(null, "Data Mahasiswa berhasil dihapus.");
     }
 }
