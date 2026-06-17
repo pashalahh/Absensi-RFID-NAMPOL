@@ -77,6 +77,8 @@ public class logabsensi {
     }
 
     public void setTanggal(LocalDate tanggal) {
+        this.tanggal = tanggal;
+    }
 
 
     public String getNama() {
