@@ -7,6 +7,8 @@ package services;
 import gui.Mahasiswa;
 import dao.GenericDAO;
 import objects.mahasiswa;
+import util.Security;
+import util.EncryptionUtils;
 import com.mongodb.client.model.Filters;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,12 +43,22 @@ public class MahasiswaService {
      *
      * @param mahasiswaBaru
      */
-    public void tambahMahasiswa (mahasiswa mahasiswaBaru) {
-        DAO.save(mahasiswaBaru); // Memanggil insertOne melalui GenericDAO [3]
-    }
+    public void tambahMahasiswa(mahasiswa m) {
+
+    m.setNimMahasiswa(
+        EncryptionUtils.encrypt(m.getNimMahasiswa())
+    );
+
+    m.setNoTelp(
+        EncryptionUtils.encrypt(m.getNoTelp())
+    );
+
+    DAO.save(m);
+}
 
     public void tambahMahasiswa(String uidRfid, String nimMahasiswa, String nama, String kelas, String noTelp) {
-        mahasiswa mahasiswaBaru = new mahasiswa(uidRfid, nimMahasiswa, nama, kelas, noTelp);
+        String hashedUID = Security.getHash(uidRfid, Security.SHA_256);
+        mahasiswa mahasiswaBaru = new mahasiswa(hashedUID, EncryptionUtils.encrypt(nimMahasiswa), nama, kelas,  EncryptionUtils.encrypt(noTelp));
         DAO.save(mahasiswaBaru); // Memanggil insertOne melalui GenericDAO [3]
     }
     
@@ -87,8 +99,8 @@ public class MahasiswaService {
 
         // Mengubah layout panel target menjadi BorderLayout
         panelTarget.setLayout(new BorderLayout());
-        // Mengatur warna background utama menjadi biru
-        panelTarget.setBackground(new Color(68, 114, 196));
+        // Mengatur warna background utama menjadi Hijau
+        panelTarget.setBackground(new Color(153, 255, 204));
 
         // Membuat panel grid khusus untuk menampung kotak/card
         JPanel gridPanel = new JPanel(new GridLayout(0, 3, 10, 10));
@@ -98,10 +110,10 @@ public class MahasiswaService {
         // 3. Iterasi data dan menambahkannya ke panel grid
         try {
             for (mahasiswa m : daftarMahasiswa) {
-                // Membuat panel 'Card' (box orange) untuk 1 karyawan
-                // Layout 4 baris 1 kolom agar kolor berisi Nama,ID, Departemen, panel control 
-                JPanel cardPanel = new JPanel(new GridLayout(4, 1, 0, 0));
-                cardPanel.setBackground(new Color(237, 125, 49)); // Warna background orange
+                // 2. MENGUBAH LAYOUT JADI 5 BARIS 1 KOLOM AGAR TEKS TERURUT KE BAWAH
+                // (4 Label + 1 Control Panel Tombol = 5 Komponen)
+                JPanel cardPanel = new JPanel(new GridLayout(5, 1, 0, 5));
+                cardPanel.setBackground(Color.WHITE); // Warna background orange
 
                 // Memberikan garis tepi tipis membulat (rounded) dan padding/jarak ke dalam
                 cardPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -111,33 +123,33 @@ public class MahasiswaService {
 
                 // Membuat Label Nama & Set warna teks jadi Putih
                 JLabel lblNama = new JLabel("Nama: " + m.getNama());
-                lblNama.setForeground(Color.WHITE);
+                lblNama.setForeground(Color.BLACK);
 
                 // Membuat Label ID Karyawan & Set warna teks jadi Putih
-                JLabel lblNim = new JLabel("NIM Mahasiswa: " + m.getNimMahasiswa());
-                lblNim.setForeground(Color.WHITE);
+                JLabel lblNim = new JLabel("NIM Mahasiswa: " + EncryptionUtils.decrypt(m.getNimMahasiswa()));
+                lblNim.setForeground(Color.BLACK);
 
                 // Membuat Label Departemen & Set warna teks jadi Putih
                 JLabel lblKls = new JLabel("Kelas: " + m.getKelas());
-                lblKls.setForeground(Color.WHITE);
+                lblKls.setForeground(Color.BLACK);
                 
-                JLabel lblTlp = new JLabel("No Telpon: " + m.getNoTelp());
-                lblTlp.setForeground(Color.WHITE);
+                JLabel lblTlp = new JLabel("No Telpon: " + EncryptionUtils.decrypt(m.getNoTelp()));
+                lblTlp.setForeground(Color.BLACK);
 
                 // Membuat panel kontrol 1 baris 2 kolom, berisi tombol edit dan hapus
                 JPanel controlPanel = new JPanel(new GridLayout(1, 2, 20, 15));
-                controlPanel.setBackground(new Color(237, 125, 49));
+                controlPanel.setBackground(Color.WHITE);
 
                 JButton tombolEdit = new JButton("Edit");
                 tombolEdit.setBackground(Color.ORANGE);
                 tombolEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 tombolEdit.addActionListener((ActionEvent e) -> {
                     Mahasiswa.txtUID.setText(m.getUidRfid());
-                    Mahasiswa.txtNim.setText(m.getNimMahasiswa());
+                    Mahasiswa.txtNim.setText( EncryptionUtils.decrypt(m.getNimMahasiswa()));
                     Mahasiswa.txtNim.setEnabled(false); 
                     Mahasiswa.txtNama.setText(m.getNama());
                     Mahasiswa.txtKls.setSelectedItem(m.getKelas());
-                    Mahasiswa.txtNoTelp.setText(m.getNoTelp());
+                    Mahasiswa.txtNoTelp.setText( EncryptionUtils.decrypt(m.getNoTelp()));
                     Mahasiswa.btnUpdate.setEnabled(true);
                     Mahasiswa.btnSave.setEnabled(false); 
                 });
@@ -187,6 +199,7 @@ public class MahasiswaService {
             panelTarget.revalidate();
             panelTarget.repaint();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     
@@ -218,14 +231,24 @@ public class MahasiswaService {
      * @param newK
      */
     public void updateMahasiswa(mahasiswa newm) {
-        Bson filter = Filters.eq("nimMahasiswa", newm.getNimMahasiswa());
+        String encryptedNim = EncryptionUtils.encrypt(newm.getNimMahasiswa());
+        String encryptedNoTelp = EncryptionUtils.encrypt(newm.getNoTelp());
+
+        Bson filter = Filters.eq("nimMahasiswa", encryptedNim);
         mahasiswa m = DAO.findOne(filter);
         if (m != null) {
-            DAO.update(filter, newm);
-            Mahasiswa.showData("");
-            JOptionPane.showMessageDialog(null, "Data berhasil diperbarui!");
-        }
+
+        // simpan kembali dalam bentuk terenkripsi
+        newm.setNimMahasiswa(encryptedNim);
+        newm.setNoTelp(encryptedNoTelp);
+
+        DAO.update(filter, newm);
+
+        Mahasiswa.showData("");
+        JOptionPane.showMessageDialog(null,
+                "Data berhasil diperbarui!");
     }
+}
 
     /**
      * 5.DELETE: Menghapus data karyawan dari database [5], [6]
@@ -233,7 +256,7 @@ public class MahasiswaService {
      * @param idK
      */
     public void hapusMahasiswa(String idK) {
-        Bson filter = Filters.eq("nimMahasiswa", idK);
+        Bson filter = Filters.eq("nimMahasiswa",EncryptionUtils.encrypt(idK));
         DAO.delete(filter); // Menggunakan deleteOne [6]
         Mahasiswa.showData("");
         JOptionPane.showMessageDialog(null, "Data Mahasiswa berhasil dihapus.");

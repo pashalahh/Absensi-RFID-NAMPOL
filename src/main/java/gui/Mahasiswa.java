@@ -299,8 +299,8 @@ public class Mahasiswa extends javax.swing.JFrame {
         m.setKelas(txtKls.getSelectedItem().toString());
         m.setNoTelp(txtNoTelp.getText());
         MahasiswaService service = new MahasiswaService();
-        service.tambahMahasiswa(m);
-        showData("");
+        service.updateMahasiswa(m);
+        refresAll();
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void txtNamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNamaActionPerformed
@@ -366,6 +366,7 @@ public class Mahasiswa extends javax.swing.JFrame {
         showData("");
         txtUID.setText("");
         txtNim.setText("");
+        txtNim.setEnabled(true);
         txtNama.setText("");
         txtKls.setSelectedIndex(0); 
         txtNoTelp.setText("");
