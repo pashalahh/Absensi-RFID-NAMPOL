@@ -4,7 +4,8 @@
  */
 package services;
 
-import gui.Mahasiswa;
+//import gui.Mahasiswa;
+import PanelAdmin.DataMahasiswa;
 import dao.GenericDAO;
 import objects.mahasiswa;
 import util.Security;
@@ -144,14 +145,14 @@ public class MahasiswaService {
                 tombolEdit.setBackground(Color.ORANGE);
                 tombolEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 tombolEdit.addActionListener((ActionEvent e) -> {
-                    Mahasiswa.txtUID.setText(m.getUidRfid());
-                    Mahasiswa.txtNim.setText( EncryptionUtils.decrypt(m.getNimMahasiswa()));
-                    Mahasiswa.txtNim.setEnabled(false); 
-                    Mahasiswa.txtNama.setText(m.getNama());
-                    Mahasiswa.txtKls.setSelectedItem(m.getKelas());
-                    Mahasiswa.txtNoTelp.setText( EncryptionUtils.decrypt(m.getNoTelp()));
-                    Mahasiswa.btnUpdate.setEnabled(true);
-                    Mahasiswa.btnSave.setEnabled(false); 
+                    DataMahasiswa.txtUID.setText(m.getUidRfid());
+                    DataMahasiswa.txtNim.setText( EncryptionUtils.decrypt(m.getNimMahasiswa()));
+                    DataMahasiswa.txtNim.setEnabled(false); 
+                    DataMahasiswa.txtNama.setText(m.getNama());
+                    DataMahasiswa.txtKls.setSelectedItem(m.getKelas());
+                    DataMahasiswa.txtNoTelp.setText( EncryptionUtils.decrypt(m.getNoTelp()));
+                    DataMahasiswa.btnUpdate.setEnabled(true);
+                    DataMahasiswa.btnSave.setEnabled(false); 
                 });
                 JButton tombolDelete = new JButton("Delete");
                 tombolDelete.setBackground(Color.RED);
@@ -244,7 +245,7 @@ public class MahasiswaService {
 
         DAO.update(filter, newm);
 
-        Mahasiswa.showData("");
+        DataMahasiswa.showData("");
         JOptionPane.showMessageDialog(null,
                 "Data berhasil diperbarui!");
     }
@@ -258,7 +259,7 @@ public class MahasiswaService {
     public void hapusMahasiswa(String idK) {
         Bson filter = Filters.eq("nimMahasiswa",EncryptionUtils.encrypt(idK));
         DAO.delete(filter); // Menggunakan deleteOne [6]
-        Mahasiswa.showData("");
+        DataMahasiswa.showData("");
         JOptionPane.showMessageDialog(null, "Data Mahasiswa berhasil dihapus.");
     }
 }
