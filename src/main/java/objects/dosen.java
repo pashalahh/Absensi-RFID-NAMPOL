@@ -4,43 +4,40 @@
  */
 package objects;
 
+import java.time.LocalDateTime;
+
 /**
  *
  * @author LENOVO
  */
 public class dosen {
     
-    private String uidRfid;
     private String nipDosen;
     private String nama;
-    private String noTelp;
+    private String username;
+    private String password;
+    private LocalDateTime lastLogin;
     
     public dosen (){
     }
 
-    public dosen(String uidRfid, String nipDosen, String nama, String noTelp) {
-        this.uidRfid = uidRfid;
+    public dosen(String nipDosen, String nama, String username, String password, LocalDateTime lastLogin) {
         this.nipDosen = nipDosen;
         this.nama = nama;
-        this.noTelp = noTelp;
+        this.username = username;
+        this.password= password;
+        this.lastLogin = lastLogin;
     }
 
     @Override
     public String toString() {
         return "dosen{" + 
-                "uidRfid=" + uidRfid + 
                 ", nipDosen=" + nipDosen + 
                 ", nama=" + nama + 
-                ", noTelp=" + noTelp + '}';
+                ", username=" + username +
+                ", password=" + password +'}';
     }
 
-    public String getUidRfid() {
-        return uidRfid;
-    }
-
-    public void setUidRfid(String uidRfid) {
-        this.uidRfid = uidRfid;
-    }
 
     public String getNipDosen() {
         return nipDosen;
@@ -57,15 +54,29 @@ public class dosen {
     public void setNama(String nama) {
         this.nama = nama;
     }
-
-    public String getNoTelp() {
-        return noTelp;
+    
+    public String getUsername() {
+        return username;
     }
 
-    public void setNoTelp(String noTelp) {
-        this.noTelp = noTelp;
+    public void setUsername(String username) {
+        this.username = username;
     }
     
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
     
-    
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
 }
+

@@ -4,7 +4,7 @@
  */
 package PanelAdmin;
 
-import Service.DigitalClockService;
+import services.DigitalClockService;
 /**
  *
  * @author ADVAN

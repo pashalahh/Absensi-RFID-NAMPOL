@@ -4,7 +4,7 @@
  */
 package tapok.absensirfid;
 
-import PanelAdmin.DashboardAdmin;
+import PanelAdmin.Login;
 import java.awt.Frame;
 
 /**
@@ -59,7 +59,7 @@ public class MainApp extends javax.swing.JFrame {
 
     private void btnAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdminActionPerformed
         // TODO add your handling code here:
-        DashboardAdmin admin = new DashboardAdmin();
+        Login admin = new Login();
         admin.setVisible(true); 
         admin.setExtendedState(Frame.MAXIMIZED_BOTH); 
     }//GEN-LAST:event_btnAdminActionPerformed
