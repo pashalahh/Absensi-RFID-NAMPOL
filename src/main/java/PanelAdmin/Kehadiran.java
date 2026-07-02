@@ -15,8 +15,41 @@ public class Kehadiran extends javax.swing.JPanel {
      */
     public Kehadiran() {
         initComponents();
+        
+        // 1. Format visual JSpinner
+        javax.swing.JSpinner.DateEditor editor1 = new javax.swing.JSpinner.DateEditor(jSpinner1, "dd-MM-yyyy");
+        jSpinner1.setEditor(editor1);
+        
+        javax.swing.JSpinner.DateEditor editor2 = new javax.swing.JSpinner.DateEditor(jSpinner2, "dd-MM-yyyy");
+        jSpinner2.setEditor(editor2);
+        
+        // 2. Setup Layout Kontainer (Gunakan batasan biar rapi)
+        jPanel11.setLayout(new javax.swing.BoxLayout(jPanel11, javax.swing.BoxLayout.Y_AXIS));
+        
+        // 3. Jalankan pemuatan data awal
+        sinkronisasiStatistikDashboard();
+        eksekusiFilterLaporan();
+        
+        // 4. Paksa UI untuk menggambar ulang di awal agar data langsung nongol
+        this.revalidate();
+        this.repaint();
     }
 
+    private void eksekusiFilterLaporan() {
+        if (jSpinner1.getValue() != null && jSpinner2.getValue() != null) {
+            java.util.Date dateMulai = (java.util.Date) jSpinner1.getValue();
+            java.util.Date dateSelesai = (java.util.Date) jSpinner2.getValue();
+            
+            // Konversi java.util.Date ke java.time.LocalDate
+            java.time.LocalDate tglMulai = dateMulai.toInstant()
+                    .atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            java.time.LocalDate tglSelesai = dateSelesai.toInstant()
+                    .atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            
+            // Jalankan query filter ke database
+            muatLaporanBerdasarkanTanggal(tglMulai, tglSelesai);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -42,12 +75,13 @@ public class Kehadiran extends javax.swing.JPanel {
         jPanel7 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         btnAutoRefresh4 = new javax.swing.JButton();
-        jPanel11 = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
         jLabel10 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         jSpinner2 = new javax.swing.JSpinner();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel11 = new javax.swing.JPanel();
 
         jPanel2.setBackground(new java.awt.Color(202, 255, 241));
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -57,7 +91,6 @@ public class Kehadiran extends javax.swing.JPanel {
 
         lblscan.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lblscan.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblscan.setText("700");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -88,7 +121,6 @@ public class Kehadiran extends javax.swing.JPanel {
 
         lblhadir.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lblhadir.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblhadir.setText("600");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -119,7 +151,6 @@ public class Kehadiran extends javax.swing.JPanel {
 
         lblterlambat.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lblterlambat.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblterlambat.setText("70");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -150,7 +181,6 @@ public class Kehadiran extends javax.swing.JPanel {
 
         lbltidakhadir.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lbltidakhadir.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lbltidakhadir.setText("30");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -182,19 +212,6 @@ public class Kehadiran extends javax.swing.JPanel {
         btnAutoRefresh4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnAutoRefresh4.setText("Auto Refresh");
 
-        jPanel11.setBackground(new java.awt.Color(153, 255, 204));
-
-        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
-        jPanel11.setLayout(jPanel11Layout);
-        jPanel11Layout.setHorizontalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel11Layout.setVerticalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 271, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -202,10 +219,9 @@ public class Kehadiran extends javax.swing.JPanel {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 501, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnAutoRefresh4)
                 .addGap(22, 22, 22))
-            .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -214,8 +230,6 @@ public class Kehadiran extends javax.swing.JPanel {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAutoRefresh4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -223,6 +237,11 @@ public class Kehadiran extends javax.swing.JPanel {
 
         jSpinner1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jSpinner1.setModel(new javax.swing.SpinnerDateModel());
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner1StateChanged(evt);
+            }
+        });
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel10.setText("S/D");
@@ -231,6 +250,26 @@ public class Kehadiran extends javax.swing.JPanel {
 
         jSpinner2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jSpinner2.setModel(new javax.swing.SpinnerDateModel());
+        jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner2StateChanged(evt);
+            }
+        });
+
+        jPanel11.setBackground(new java.awt.Color(153, 255, 204));
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1186, Short.MAX_VALUE)
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 326, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(jPanel11);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -248,18 +287,21 @@ public class Kehadiran extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel14)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(43, 43, 43)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(45, 45, 45)
-                            .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(44, 44, 44))
+                        .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(125, 125, 125)
+                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(124, 124, 124)
+                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 124, Short.MAX_VALUE)
+                                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(91, 91, 91))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -280,20 +322,32 @@ public class Kehadiran extends javax.swing.JPanel {
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 338, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
+        // TODO add your handling code here:
+        eksekusiFilterLaporan();
+    }//GEN-LAST:event_jSpinner1StateChanged
+
+    private void jSpinner2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner2StateChanged
+        // TODO add your handling code here:
+        eksekusiFilterLaporan();
+    }//GEN-LAST:event_jSpinner2StateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -313,6 +367,7 @@ public class Kehadiran extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JLabel lblhadir;
@@ -320,4 +375,177 @@ public class Kehadiran extends javax.swing.JPanel {
     private javax.swing.JLabel lblterlambat;
     private javax.swing.JLabel lbltidakhadir;
     // End of variables declaration//GEN-END:variables
+public void sinkronisasiStatistikDashboard() {
+        try {
+            dao.GenericDAO<objects.mahasiswa> mDAO = new dao.GenericDAO<>("mahasiswa", objects.mahasiswa.class);
+            dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
+            
+            java.util.List<objects.mahasiswa> semuaMhs = mDAO.findAll();
+            long totalMhs = (semuaMhs != null) ? semuaMhs.size() : 0;
+            
+            java.time.LocalDate hariIni = java.time.LocalDate.now();
+            
+            org.bson.conversions.Bson filterHadir = com.mongodb.client.model.Filters.and(
+                com.mongodb.client.model.Filters.eq("tanggal", hariIni),
+                com.mongodb.client.model.Filters.eq("status", "Tepat Waktu")
+            );
+            java.util.List<objects.logabsensi> listHadir = logDAO.findMany(filterHadir);
+            long totalHadir = (listHadir != null) ? listHadir.size() : 0;
+            
+            org.bson.conversions.Bson filterTerlambat = com.mongodb.client.model.Filters.and(
+                com.mongodb.client.model.Filters.eq("tanggal", hariIni),
+                com.mongodb.client.model.Filters.regex("status", "^Terlambat")
+            );
+            java.util.List<objects.logabsensi> listTerlambat = logDAO.findMany(filterTerlambat);
+            long totalTerlambat = (listTerlambat != null) ? listTerlambat.size() : 0;
+            
+            long tidakAbsen = totalMhs - (totalHadir + totalTerlambat);
+            if (tidakAbsen < 0) tidakAbsen = 0;
+            
+            lblhadir.setText(String.valueOf(totalHadir));
+            lblterlambat.setText(String.valueOf(totalTerlambat));
+            lbltidakhadir.setText(String.valueOf(tidakAbsen));
+            
+        } catch (Exception e) {
+            System.out.println("Gagal memuat statistik dashboard hari ini: " + e.getMessage());
+        }
+    }
+
+    public void muatLaporanBerdasarkanTanggal(java.time.LocalDate tglMulai, java.time.LocalDate tglSelesai) {
+        try {
+            dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
+            
+            java.util.Date dateMulai = java.util.Date.from(tglMulai.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+            java.util.Date dateSelesai = java.util.Date.from(tglSelesai.atTime(23, 59, 59).atZone(java.time.ZoneId.systemDefault()).toInstant());
+            
+            org.bson.conversions.Bson filterJangkauan = com.mongodb.client.model.Filters.and(
+                com.mongodb.client.model.Filters.gte("tanggal", dateMulai),
+                com.mongodb.client.model.Filters.lte("tanggal", dateSelesai)
+            );
+            
+            java.util.List<objects.logabsensi> daftarLog = logDAO.findMany(filterJangkauan);
+            
+            long scanCount = 0;
+            long hadirCount = 0;
+            long lambatCount = 0;
+            long alpaCount = 0;
+            
+            // 1. Bersihkan kontainer kartu log
+            jPanel11.removeAll(); 
+            
+            // Konfigurasi ScrollPane bawaan NetBeans agar transparan dan bersih
+            jScrollPane1.setBorder(null);
+            jScrollPane1.setOpaque(false);
+            jScrollPane1.getViewport().setOpaque(false);
+            
+            if (daftarLog != null && !daftarLog.isEmpty()) {
+                // Urutkan data berdasarkan waktu terbaru (Descending)
+                daftarLog.sort((log1, log2) -> {
+                    if (log1.getWaktu() == null || log2.getWaktu() == null) return 0;
+                    return log2.getWaktu().compareTo(log1.getWaktu());
+                });
+                
+                java.time.format.DateTimeFormatter tglFormat = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                
+                for (objects.logabsensi log : daftarLog) {
+                    scanCount++;
+                    
+                    if (log.getStatus().equalsIgnoreCase("Tepat Waktu")) {
+                        hadirCount++;
+                    } else if (log.getStatus().startsWith("Terlambat")) {
+                        lambatCount++;
+                    } else if (log.getStatus().equalsIgnoreCase("Tidak Hadir")) {
+                        alpaCount++;
+                    }
+                    
+                    String jamAbsen = "--:--";
+                    if (log.getWaktu() != null) {
+                        jamAbsen = log.getWaktu().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+                    }
+                    
+                    String stringTanggal = log.getTanggal().format(tglFormat);
+                    
+                    // --- Desain Kartu Wrapper (Padding kanan-kiri agar melayang dari tepi) ---
+                    javax.swing.JPanel wrapperCard = new javax.swing.JPanel();
+                    wrapperCard.setLayout(new java.awt.BorderLayout());
+                    wrapperCard.setOpaque(false);
+                    wrapperCard.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 10, 20));
+                    wrapperCard.setMaximumSize(new java.awt.Dimension(1019, 75)); 
+                    
+                    // --- Desain Kartu Putih Utama ---
+                    javax.swing.JPanel rowCard = new javax.swing.JPanel();
+                    rowCard.setLayout(new java.awt.BorderLayout(15, 0));
+                    rowCard.setBackground(java.awt.Color.WHITE);
+                    rowCard.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                        javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(220, 235, 230)),
+                        javax.swing.BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                    ));
+                    
+                    javax.swing.JPanel leftPanel = new javax.swing.JPanel();
+                    leftPanel.setLayout(new javax.swing.BoxLayout(leftPanel, javax.swing.BoxLayout.Y_AXIS));
+                    leftPanel.setBackground(java.awt.Color.WHITE);
+                    
+                    javax.swing.JLabel lblNama = new javax.swing.JLabel(log.getNama());
+                    lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+                    lblNama.setForeground(new java.awt.Color(40, 40, 40));
+                    
+                    javax.swing.JLabel lblDetail = new javax.swing.JLabel("Tanggal: " + stringTanggal + "   |   Jam: " + jamAbsen);
+                    lblDetail.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+                    lblDetail.setForeground(java.awt.Color.GRAY);
+                    
+                    leftPanel.add(lblNama);
+                    leftPanel.add(javax.swing.Box.createVerticalStrut(2));
+                    leftPanel.add(lblDetail);
+                    
+                    javax.swing.JLabel lblBadgeStatus = new javax.swing.JLabel("  " + log.getStatus().toUpperCase() + "  ");
+                    lblBadgeStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 11));
+                    lblBadgeStatus.setOpaque(true);
+                    lblBadgeStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                    
+                    if (log.getStatus().contains("Terlambat")) {
+                        lblBadgeStatus.setBackground(new java.awt.Color(255, 230, 230));
+                        lblBadgeStatus.setForeground(new java.awt.Color(200, 0, 0));
+                    } else if (log.getStatus().equals("Tidak Hadir")) {
+                        lblBadgeStatus.setBackground(java.awt.Color.LIGHT_GRAY);
+                        lblBadgeStatus.setForeground(java.awt.Color.DARK_GRAY);
+                    } else {
+                        lblBadgeStatus.setBackground(new java.awt.Color(230, 245, 235));
+                        lblBadgeStatus.setForeground(new java.awt.Color(0, 130, 40));
+                    }
+                    
+                    rowCard.add(leftPanel, java.awt.BorderLayout.WEST);
+                    rowCard.add(lblBadgeStatus, java.awt.BorderLayout.EAST);
+                    
+                    wrapperCard.add(rowCard, java.awt.BorderLayout.CENTER);
+                    jPanel11.add(wrapperCard);
+                }
+                
+                // PERBAIKAN LEBAR: Menggunakan lebar jPanel7 dikurangi margin agar ukuran card tidak 0
+                int totalTinggiPanel = daftarLog.size() * 85; 
+                jPanel11.setPreferredSize(new java.awt.Dimension(jPanel7.getWidth() - 30, totalTinggiPanel));
+                
+            } else {
+                javax.swing.JPanel emptyCard = new javax.swing.JPanel();
+                emptyCard.setOpaque(false);
+                emptyCard.add(new javax.swing.JLabel("Tidak ada data absensi pada rentang tanggal ini."));
+                jPanel11.add(emptyCard);
+            }
+            
+            // 2. Set ringkasan counter statistik ke box atas
+            lblscan.setText(String.valueOf(scanCount));
+            lblhadir.setText(String.valueOf(hadirCount));
+            lblterlambat.setText(String.valueOf(lambatCount));
+            lbltidakhadir.setText(String.valueOf(alpaCount));
+            
+            // 3. Segarkan tampilan komponen UI secara hierarkis
+            jPanel11.revalidate();
+            jPanel11.repaint();
+            jScrollPane1.revalidate();
+            jScrollPane1.repaint();
+            
+        } catch (Exception e) {
+            System.out.println("Gagal memuat laporan berkala: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

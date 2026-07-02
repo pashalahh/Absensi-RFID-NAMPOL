@@ -15,6 +15,15 @@ public class DataDosen extends javax.swing.JPanel {
      */
     public DataDosen() {
         initComponents();
+        // Bind action listener secara manual untuk tombol Tambah (jButton12)
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+        
+        // Load data dosen pertama kali panel dibuka
+        showData("");
     }
 
     /**
@@ -107,6 +116,11 @@ public class DataDosen extends javax.swing.JPanel {
         jButton12.setText("Tambah");
         jButton12.setIconTextGap(12);
         jButton12.setInheritsPopupMenu(true);
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -115,7 +129,11 @@ public class DataDosen extends javax.swing.JPanel {
         jLabel2.setText("jLabel2");
 
         jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jTextField1.setText("Cari NIM atau Nama");
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -125,7 +143,7 @@ public class DataDosen extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -174,7 +192,7 @@ public class DataDosen extends javax.swing.JPanel {
                     .addComponent(jButton12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(57, 57, 57)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -203,7 +221,7 @@ public class DataDosen extends javax.swing.JPanel {
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton12)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
@@ -232,10 +250,31 @@ public class DataDosen extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        refreshAll();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        String nip = txtNIP.getText().trim();
+        String nama = txtNama.getText().trim();
+        String username = txtUsername.getText().trim();
+        
+        if (nip.isEmpty() || nama.isEmpty() || username.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "NIP, Nama, dan Username tidak boleh kosong untuk update!", 
+                    "Validasi Gagal", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        objects.dosen d = new objects.dosen();
+        d.setNipDosen(nip);
+        d.setNama(nama);
+        d.setUsername(username);
+        d.setPassword(new String(txtPassw.getPassword()));
+        
+        new services.DosenService().updateDosen(d);
+        refreshAll();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void txtNamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNamaActionPerformed
@@ -245,6 +284,36 @@ public class DataDosen extends javax.swing.JPanel {
     private void txtNIPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNIPActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNIPActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        // TODO add your handling code here:
+        String nip = txtNIP.getText().trim();
+        String nama = txtNama.getText().trim();
+        String username = txtUsername.getText().trim();
+        String password = new String(txtPassw.getPassword()).trim();
+        
+        if (nip.isEmpty() || nama.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Semua data (NIP, Nama, Username, & Password) wajib diisi!", 
+                    "Validasi Gagal", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            return; 
+        }
+        
+        objects.dosen d = new objects.dosen();
+        d.setNipDosen(nip);
+        d.setNama(nama);
+        d.setUsername(username);
+        d.setPassword(password);
+        
+        new services.DosenService().tambahDosen(d);
+        refreshAll();
+    }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+        showData(jTextField1.getText());
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -268,4 +337,20 @@ public class DataDosen extends javax.swing.JPanel {
     private javax.swing.JPasswordField txtPassw;
     public static javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
+    public static void showData(String key) {
+        services.DosenService service = new services.DosenService();
+        // Memanggil fungsi tampilDosen untuk merender data secara dinamis ke jPanel4 milik DataDosen
+        service.tampilDosen(jPanel4, key);
+    }
+
+    private void refreshAll() {
+        showData("");
+        txtNIP.setText("");
+        txtNIP.setEnabled(true);
+        txtNama.setText("");
+        txtUsername.setText("");
+        txtPassw.setText("");
+        jButton2.setEnabled(false); // Matikan tombol update sebelum ada kartu yang dipilih
+        txtNIP.requestFocus();
+    }
 }

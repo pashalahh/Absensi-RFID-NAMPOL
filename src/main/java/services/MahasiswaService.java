@@ -262,4 +262,15 @@ public class MahasiswaService {
         DataMahasiswa.showData("");
         JOptionPane.showMessageDialog(null, "Data Mahasiswa berhasil dihapus.");
     }
+    
+    /**
+     * Fungsi kustom untuk mencari satu data mahasiswa secara spesifik 
+     * berdasarkan nilai hash UID RFID untuk kebutuhan alur menu Absensi.
+     * 
+     * @param hashedUID Nilai UID RFID yang sudah di-hash SHA-256
+     * @return Objek mahasiswa jika ditemukan, atau null jika tidak terdaftar
+     */
+    public mahasiswa cariMahasiswaSpesifikUID(String uid) {
+        return DAO.findOne(com.mongodb.client.model.Filters.eq("uidRfid", uid));
+    }
 }

@@ -9,12 +9,34 @@ package PanelAdmin;
  * @author ADVAN
  */
 public class Dashboard extends javax.swing.JPanel {
+    private final javax.swing.JPanel pnlLogDinamis = new javax.swing.JPanel();
 
     /**
      * Creates new form NewJPanel
      */
     public Dashboard() {
         initComponents();
+        
+        // 1. Format JSpinner ke tanggal Indonesia
+        javax.swing.JSpinner.DateEditor editor = new javax.swing.JSpinner.DateEditor(jSpinner1, "dd-MM-yyyy");
+        jSpinner1.setEditor(editor);
+        
+        // 2. Setup kontainer log di dalam JScrollPane1
+        pnlLogDinamis.setLayout(new javax.swing.BoxLayout(pnlLogDinamis, javax.swing.BoxLayout.Y_AXIS));
+        pnlLogDinamis.setBackground(java.awt.Color.WHITE);
+        jScrollPane1.setViewportView(pnlLogDinamis);
+        jScrollPane1.setBorder(null);
+        jScrollPane1.getViewport().setBackground(java.awt.Color.WHITE);
+        
+        // 3. Listener saat tanggal spinner berubah
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sinkronisasiSeluruhDashboard();
+            }
+        });
+        
+        // Load data pertama kali
+        sinkronisasiSeluruhDashboard();
     }
 
     /**
@@ -42,11 +64,12 @@ public class Dashboard extends javax.swing.JPanel {
         jPanel6 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         lbltidakabsen = new javax.swing.JLabel();
-        pnlGrafikmingguan1 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
         jLabel14 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pnlGrafikmingguan1 = new javax.swing.JPanel();
 
         jPanel1.setPreferredSize(new java.awt.Dimension(887, 685));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -59,7 +82,6 @@ public class Dashboard extends javax.swing.JPanel {
 
         lbltotalmahasiswa.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lbltotalmahasiswa.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lbltotalmahasiswa.setText("240");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -92,7 +114,6 @@ public class Dashboard extends javax.swing.JPanel {
 
         lblhadirharian.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lblhadirharian.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblhadirharian.setText("187");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -115,7 +136,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 90, -1, -1));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, -1, -1));
 
         jPanel4.setBackground(new java.awt.Color(202, 255, 241));
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -125,7 +146,6 @@ public class Dashboard extends javax.swing.JPanel {
 
         lblterlambat.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lblterlambat.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblterlambat.setText("20");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -148,20 +168,20 @@ public class Dashboard extends javax.swing.JPanel {
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 90, -1, -1));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 90, -1, -1));
 
         pnlGrafikmingguan.setBackground(new java.awt.Color(153, 255, 204));
         pnlGrafikmingguan.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel1.add(pnlGrafikmingguan, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 410, 270));
+        jPanel1.add(pnlGrafikmingguan, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 620, 270));
 
         jPanel7.setBackground(new java.awt.Color(153, 255, 204));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel4.setText("Grafik Kehadiran Mingguan");
-        jPanel7.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 10, -1, -1));
+        jPanel7.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 10, -1, -1));
 
-        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, 410, 50));
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, 620, 50));
 
         jPanel6.setBackground(new java.awt.Color(202, 255, 241));
         jPanel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -171,7 +191,6 @@ public class Dashboard extends javax.swing.JPanel {
 
         lbltidakabsen.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         lbltidakabsen.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lbltidakabsen.setText("33");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -194,11 +213,7 @@ public class Dashboard extends javax.swing.JPanel {
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 90, -1, -1));
-
-        pnlGrafikmingguan1.setBackground(new java.awt.Color(153, 255, 204));
-        pnlGrafikmingguan1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel1.add(pnlGrafikmingguan1, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 310, 290, 270));
+        jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 90, -1, -1));
 
         jPanel8.setBackground(new java.awt.Color(153, 255, 204));
         jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -207,24 +222,30 @@ public class Dashboard extends javax.swing.JPanel {
         jLabel7.setText("Activity Terbaru");
         jPanel8.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, -1, -1));
 
-        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 260, 290, 50));
+        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 260, 290, 50));
 
         jSpinner1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jSpinner1.setModel(new javax.swing.SpinnerDateModel());
-        jPanel1.add(jSpinner1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 30, -1, -1));
+        jPanel1.add(jSpinner1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 30, -1, -1));
 
         jLabel14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/icon/tanggal.png"))); // NOI18N
-        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 30, -1, 30));
+        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 30, -1, 30));
+
+        pnlGrafikmingguan1.setBackground(new java.awt.Color(153, 255, 204));
+        pnlGrafikmingguan1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jScrollPane1.setViewportView(pnlGrafikmingguan1);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 310, 290, 270));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1106, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 691, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -244,6 +265,7 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JLabel lblhadirharian;
     private javax.swing.JLabel lblterlambat;
@@ -252,4 +274,115 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JPanel pnlGrafikmingguan;
     private javax.swing.JPanel pnlGrafikmingguan1;
     // End of variables declaration//GEN-END:variables
+private void sinkronisasiSeluruhDashboard() {
+        if (jSpinner1.getValue() == null) return;
+        
+        try {
+            dao.GenericDAO<objects.mahasiswa> mDAO = new dao.GenericDAO<>("mahasiswa", objects.mahasiswa.class);
+            dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
+            
+            // 1. Hitung total mahasiswa
+            java.util.List<objects.mahasiswa> semuaMhs = mDAO.findAll();
+            long totalMhs = (semuaMhs != null) ? semuaMhs.size() : 0;
+            lbltotalmahasiswa.setText(String.valueOf(totalMhs));
+            
+            // 2. Filter Tanggal Hari Ini untuk MongoDB
+            java.util.Date dateSelected = (java.util.Date) jSpinner1.getValue();
+            java.time.LocalDate lokalTgl = dateSelected.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            java.util.Date startHari = java.util.Date.from(lokalTgl.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+            java.util.Date endHari = java.util.Date.from(lokalTgl.atTime(23, 59, 59).atZone(java.time.ZoneId.systemDefault()).toInstant());
+            
+            org.bson.conversions.Bson filterHariIni = com.mongodb.client.model.Filters.and(
+                com.mongodb.client.model.Filters.gte("tanggal", startHari),
+                com.mongodb.client.model.Filters.lte("tanggal", endHari)
+            );
+            java.util.List<objects.logabsensi> logHariTerpilih = logDAO.findMany(filterHariIni);
+            
+            // 3. Hitung Statistik Box Atas
+            long totalHadir = 0, totalTerlambat = 0;
+            if (logHariTerpilih != null) {
+                for (objects.logabsensi log : logHariTerpilih) {
+                    if (log.getStatus().equalsIgnoreCase("Tepat Waktu")) totalHadir++;
+                    else if (log.getStatus().startsWith("Terlambat")) totalTerlambat++;
+                }
+            }
+            long tidakAbsen = totalMhs - (totalHadir + totalTerlambat);
+            if (tidakAbsen < 0) tidakAbsen = 0;
+            
+            lblhadirharian.setText(String.valueOf(totalHadir));
+            lblterlambat.setText(String.valueOf(totalTerlambat));
+            lbltidakabsen.setText(String.valueOf(tidakAbsen));
+            
+            // 4. Render Log Aktivitas Terbaru (Nama & Status Saja)
+            pnlLogDinamis.removeAll();
+            if (logHariTerpilih != null && !logHariTerpilih.isEmpty()) {
+                logHariTerpilih.sort((l1, l2) -> l2.getWaktu().compareTo(l1.getWaktu())); // Terbaru di atas
+                
+                int counter = 0;
+                for (objects.logabsensi log : logHariTerpilih) {
+                    if (counter >= 6) break; // Maksimal 6 baris
+                    
+                    javax.swing.JPanel rowCard = new javax.swing.JPanel(new java.awt.BorderLayout(10, 0));
+                    rowCard.setBackground(java.awt.Color.WHITE);
+                    rowCard.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                        javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(240, 240, 240)),
+                        javax.swing.BorderFactory.createEmptyBorder(8, 15, 8, 15)
+                    ));
+                    rowCard.setMaximumSize(new java.awt.Dimension(280, 45));
+                    
+                    javax.swing.JLabel lblNama = new javax.swing.JLabel(log.getNama());
+                    lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+                    
+                    javax.swing.JLabel lblStatus = new javax.swing.JLabel(log.getStatus().toUpperCase());
+                    lblStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 10));
+                    lblStatus.setForeground(log.getStatus().contains("Terlambat") ? new java.awt.Color(220, 53, 69) : new java.awt.Color(40, 167, 69));
+                    
+                    rowCard.add(lblNama, java.awt.BorderLayout.WEST);
+                    rowCard.add(lblStatus, java.awt.BorderLayout.EAST);
+                    pnlLogDinamis.add(rowCard);
+                    counter++;
+                }
+                pnlLogDinamis.setPreferredSize(new java.awt.Dimension(0, counter * 45));
+            } else {
+                pnlLogDinamis.add(new javax.swing.JLabel(" Belum ada aktivitas scan harian."));
+            }
+            
+            // 5. Render Grafik Batang
+            tampilkanGrafikBatang(totalHadir, totalTerlambat, tidakAbsen);
+            
+            // Refresh Frame Grafis
+            pnlLogDinamis.revalidate(); pnlLogDinamis.repaint();
+            jScrollPane1.revalidate(); jScrollPane1.repaint();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+private void tampilkanGrafikBatang(long hadir, long terlambat, long alpa) {
+        org.jfree.data.category.DefaultCategoryDataset dataset = new org.jfree.data.category.DefaultCategoryDataset();
+        dataset.setValue(hadir, "Mahasiswa", "Tepat Waktu");
+        dataset.setValue(terlambat, "Mahasiswa", "Terlambat");
+        dataset.setValue(alpa, "Mahasiswa", "Tidak Absen");
+        
+        org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createBarChart(
+                null, "Kategori Status", "Jumlah Orang", dataset,
+                org.jfree.chart.plot.PlotOrientation.VERTICAL, false, true, false
+        );
+        
+        // Desain Kosmetik Grafik Batang
+        org.jfree.chart.plot.CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(java.awt.Color.WHITE);
+        plot.setRangeGridlinePaint(new java.awt.Color(230, 230, 230));
+        
+        org.jfree.chart.renderer.category.BarRenderer renderer = (org.jfree.chart.renderer.category.BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, new java.awt.Color(51, 204, 153)); // Hijau Pastel
+        
+        org.jfree.chart.ChartPanel chartPanel = new org.jfree.chart.ChartPanel(chart);
+        chartPanel.setPreferredSize(new java.awt.Dimension(pnlGrafikmingguan.getWidth(), pnlGrafikmingguan.getHeight()));
+        
+        pnlGrafikmingguan.removeAll();
+        pnlGrafikmingguan.setLayout(new java.awt.BorderLayout());
+        pnlGrafikmingguan.add(chartPanel, java.awt.BorderLayout.CENTER);
+        pnlGrafikmingguan.revalidate();
+        pnlGrafikmingguan.repaint();
+    }
 }

@@ -8,6 +8,7 @@ import PanelAdmin.DataMahasiswa;
 import PanelAdmin.DataDosen;
 import PanelAdmin.Kehadiran;
 import PanelAdmin.Pengaturan;
+import PanelAdmin.Absensi;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 /**
@@ -126,6 +127,11 @@ public class DashboardAdmin extends javax.swing.JFrame {
         btnSetting.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/setting.png"))); // NOI18N
         btnSetting.setText("Pengaturan");
         btnSetting.setIconTextGap(10);
+        btnSetting.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSettingActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -195,13 +201,13 @@ public class DashboardAdmin extends javax.swing.JFrame {
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(638, Short.MAX_VALUE)
                 .addComponent(jLabel14)
                 .addGap(26, 26, 26)
                 .addComponent(jLabel13)
                 .addGap(33, 33, 33)
                 .addComponent(jButton19)
-                .addGap(30, 30, 30))
+                .addGap(54, 54, 54))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -248,6 +254,7 @@ public class DashboardAdmin extends javax.swing.JFrame {
 
     private void btnAbsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbsActionPerformed
         // TODO add your handling code here:
+        AddViews(new Absensi());
     }//GEN-LAST:event_btnAbsActionPerformed
 
     private void btnDosenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDosenActionPerformed
@@ -264,6 +271,11 @@ public class DashboardAdmin extends javax.swing.JFrame {
         // TODO add your handling code here:
         AddViews(new DataMahasiswa());
     }//GEN-LAST:event_btnMahasiswaActionPerformed
+
+    private void btnSettingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettingActionPerformed
+        // TODO add your handling code here:
+        AddViews(new Pengaturan());
+    }//GEN-LAST:event_btnSettingActionPerformed
 
     /**
      * @param args the command line arguments
