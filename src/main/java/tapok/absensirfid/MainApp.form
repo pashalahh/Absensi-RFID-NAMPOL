@@ -42,6 +42,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Absensi RFID"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAbsenActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnAdmin">
           <Properties>

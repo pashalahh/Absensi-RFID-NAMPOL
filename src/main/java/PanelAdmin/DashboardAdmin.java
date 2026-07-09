@@ -31,6 +31,7 @@ public class DashboardAdmin extends javax.swing.JFrame implements swing.I18nServ
         swing.I18nService.registerListener(this);
         // Jalankan translasi pertama kali saat aplikasi dibuka
         onLanguageChanged();
+        AddViews(new Dashboard());
     }
     public void onLanguageChanged() {
         jLabel12.setText(swing.I18nService.get("lbl.admin.system"));

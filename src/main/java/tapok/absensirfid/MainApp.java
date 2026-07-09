@@ -37,10 +37,15 @@ public class MainApp extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setLayout(new java.awt.GridLayout());
+        jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
         btnAbsen.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnAbsen.setText("Absensi RFID");
+        btnAbsen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbsenActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnAbsen);
 
         btnAdmin.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -63,6 +68,10 @@ public class MainApp extends javax.swing.JFrame {
         admin.setVisible(true); 
         admin.setExtendedState(Frame.MAXIMIZED_BOTH); 
     }//GEN-LAST:event_btnAdminActionPerformed
+
+    private void btnAbsenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbsenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAbsenActionPerformed
 
     /**
      * @param args the command line arguments

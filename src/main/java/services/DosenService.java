@@ -79,7 +79,7 @@ public class DosenService {
         panelTarget.setLayout(new BorderLayout());
         
         // Mengatur latar belakang panel sesuai skema UI
-        panelTarget.setBackground(new Color(240, 240, 240));
+        panelTarget.setBackground(new Color(153, 255, 204));
 
         // Membuat layout grid dengan 3 kolom (menyamping) untuk memajang kartu data
         JPanel gridPanel = new JPanel(new GridLayout(0, 3, 10, 10));
@@ -89,7 +89,7 @@ public class DosenService {
         try {
             for (dosen d : daftarDosen) {
                 // Layout 4 baris, 1 kolom (3 Label Informasi + 1 Control Panel Button)
-                JPanel cardPanel = new JPanel(new GridLayout(4, 1, 0, 5));
+                JPanel cardPanel = new JPanel(new GridLayout(5, 1, 0, 5));
                 cardPanel.setBackground(Color.WHITE);
 
                 // Membuat outline border ungu rounded
