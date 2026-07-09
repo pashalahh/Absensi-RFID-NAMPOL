@@ -2,7 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package PanelAdmin;
+package PanelAdmin; 
+
 import PanelAdmin.Dashboard;
 import PanelAdmin.DataMahasiswa;
 import PanelAdmin.DataDosen;
@@ -11,19 +12,37 @@ import PanelAdmin.Pengaturan;
 import PanelAdmin.Absensi;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import swing.SlidingStatusToggle;
 /**
  *
  * @author ADVAN
  */
-public class DashboardAdmin extends javax.swing.JFrame {
+public class DashboardAdmin extends javax.swing.JFrame implements swing.I18nService.I18nChangeListener {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DashboardAdmin.class.getName());
+    private SlidingStatusToggle slidingStatusToggle1;
 
     /**
      * Creates new form Adminabsensi
      */
     public DashboardAdmin() {
         initComponents();
+        // DAFTARKAN FRAME INI KE SERVICE
+        swing.I18nService.registerListener(this);
+        // Jalankan translasi pertama kali saat aplikasi dibuka
+        onLanguageChanged();
+    }
+    public void onLanguageChanged() {
+        jLabel12.setText(swing.I18nService.get("lbl.admin.system"));
+        jLabel11.setText(swing.I18nService.get("lbl.admin.slogan"));
+        
+        btnDash.setText(swing.I18nService.get("btn.menu.dashboard"));
+        btnAbs.setText(swing.I18nService.get("btn.menu.absensi"));
+        btnMahasiswa.setText(swing.I18nService.get("btn.menu.mahasiswa"));
+        btnDosen.setText(swing.I18nService.get("btn.menu.dosen"));
+        btnLapo.setText(swing.I18nService.get("btn.menu.laporan"));
+        btnSetting.setText(swing.I18nService.get("btn.menu.pengaturan"));
+        jButton19.setText(swing.I18nService.get("btn.menu.profile"));
     }
 
     /**
@@ -63,30 +82,33 @@ public class DashboardAdmin extends javax.swing.JFrame {
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Gemini_Generated_Image_swi19zswi19zswi1 (1) (2).png"))); // NOI18N
 
-        jLabel10.setFont(new java.awt.Font("Copperplate Gothic Bold", 1, 24)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Copperplate Gothic Bold", 1, 21)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("SEMANGGI");
 
-        jLabel11.setFont(new java.awt.Font("Leelawadee UI", 1, 18)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Leelawadee UI", 1, 16)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(214, 248, 221));
         jLabel11.setText("Mahasiswa Canggih");
 
-        jLabel12.setFont(new java.awt.Font("Leelawadee UI", 1, 18)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Leelawadee UI", 1, 16)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(214, 248, 221));
         jLabel12.setText("Sistem Absensi");
 
-        btnDash.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        btnDash.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         btnDash.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Home.png"))); // NOI18N
         btnDash.setText("Dashboard");
+        btnDash.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnDash.setIconTextGap(10);
         btnDash.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDashActionPerformed(evt);
             }
         });
 
-        btnAbs.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        btnAbs.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         btnAbs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/rfid.png"))); // NOI18N
         btnAbs.setText("Absensi");
+        btnAbs.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnAbs.setIconTextGap(10);
         btnAbs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -94,18 +116,21 @@ public class DashboardAdmin extends javax.swing.JFrame {
             }
         });
 
-        btnMahasiswa.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        btnMahasiswa.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         btnMahasiswa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/student.png"))); // NOI18N
         btnMahasiswa.setText("Data Mahasiswa");
+        btnMahasiswa.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnMahasiswa.setIconTextGap(10);
         btnMahasiswa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnMahasiswaActionPerformed(evt);
             }
         });
 
-        btnDosen.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        btnDosen.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         btnDosen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/dosen.png"))); // NOI18N
         btnDosen.setText("Data Dosen");
+        btnDosen.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnDosen.setIconTextGap(10);
         btnDosen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -113,9 +138,10 @@ public class DashboardAdmin extends javax.swing.JFrame {
             }
         });
 
-        btnLapo.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        btnLapo.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         btnLapo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/report.png"))); // NOI18N
         btnLapo.setText("Laporan");
+        btnLapo.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnLapo.setIconTextGap(10);
         btnLapo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -123,9 +149,10 @@ public class DashboardAdmin extends javax.swing.JFrame {
             }
         });
 
-        btnSetting.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        btnSetting.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         btnSetting.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/setting.png"))); // NOI18N
         btnSetting.setText("Pengaturan");
+        btnSetting.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnSetting.setIconTextGap(10);
         btnSetting.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -145,17 +172,17 @@ public class DashboardAdmin extends javax.swing.JFrame {
                     .addComponent(jLabel10)
                     .addComponent(jLabel11)
                     .addComponent(jLabel12))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnAbs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnDash, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnMahasiswa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnDosen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLapo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(btnDash, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAbs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnMahasiswa, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                    .addComponent(btnDosen, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLapo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnSetting, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(79, 79, 79))
+                .addGap(66, 66, 66))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -174,15 +201,15 @@ public class DashboardAdmin extends javax.swing.JFrame {
                 .addComponent(btnDash)
                 .addGap(30, 30, 30)
                 .addComponent(btnAbs)
-                .addGap(30, 30, 30)
+                .addGap(29, 29, 29)
                 .addComponent(btnMahasiswa)
-                .addGap(30, 30, 30)
+                .addGap(32, 32, 32)
                 .addComponent(btnDosen)
                 .addGap(30, 30, 30)
                 .addComponent(btnLapo)
-                .addGap(30, 30, 30)
+                .addGap(29, 29, 29)
                 .addComponent(btnSetting)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(495, Short.MAX_VALUE))
         );
 
         jPanel5.setBackground(new java.awt.Color(214, 248, 221));
@@ -191,6 +218,11 @@ public class DashboardAdmin extends javax.swing.JFrame {
         jButton19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/icon/user.png"))); // NOI18N
         jButton19.setText("Admin");
         jButton19.setIconTextGap(10);
+        jButton19.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton19ActionPerformed(evt);
+            }
+        });
 
         jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/icon/notif.png"))); // NOI18N
 
@@ -201,7 +233,7 @@ public class DashboardAdmin extends javax.swing.JFrame {
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap(638, Short.MAX_VALUE)
+                .addContainerGap(937, Short.MAX_VALUE)
                 .addComponent(jLabel14)
                 .addGap(26, 26, 26)
                 .addComponent(jLabel13)
@@ -277,6 +309,23 @@ public class DashboardAdmin extends javax.swing.JFrame {
         AddViews(new Pengaturan());
     }//GEN-LAST:event_btnSettingActionPerformed
 
+    private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
+// TODO add your handling code here:
+        // KOREKSI UTAMA: Arahkan ke PanelAdmin.Login.dosenAktif agar datanya terpanggil!
+        objects.dosen dosenSesi = PanelAdmin.Login.dosenAktif; 
+
+        // 2. Buat instance dari panel profile dengan mengirimkan data dosen aktif
+        dialogs.profile pnlProfile = new dialogs.profile(dosenSesi);
+
+        // 3. Bungkus panel ke dalam JDialog standar Swing agar muncul sebagai popup dialog
+        javax.swing.JDialog dialog = new javax.swing.JDialog((javax.swing.JFrame) javax.swing.SwingUtilities.getWindowAncestor(this), "Profil Pengguna", true);
+        dialog.getContentPane().add(pnlProfile);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this); 
+        dialog.setResizable(false);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_jButton19ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -330,4 +379,10 @@ public class DashboardAdmin extends javax.swing.JFrame {
         jPanel2.revalidate();
         jPanel2.repaint();
     }
+public swing.SlidingStatusToggle getSlidingStatusToggle1() {
+    return slidingStatusToggle1; 
+    // Ganti 'slidingStatusToggle1' sesuai dengan nama variabel toggle yang ada di menu Pengaturan Anda
+}
+// Taruh ini di dalam class utama (misal MainFrame atau DashboardAdmin) agar bisa dipanggil secara global
+public static objects.dosen dosenAktif;
 }

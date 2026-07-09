@@ -46,6 +46,9 @@ public class AuthService {
             user.setLastLogin(LocalDateTime.now());
             userDAO.update(Filters.eq("username", username), user);
 
+            // KUNCI UTAMA: Menyimpan data objek dosen yang berhasil login ke variabel static global di class Login
+            PanelAdmin.Login.dosenAktif = user;
+
             // Berhasil: Masuk ke Halaman Admin
             JOptionPane.showMessageDialog(null, "Selamat Datang, " + user.getNama());
             DashboardAdmin admPage = new DashboardAdmin();

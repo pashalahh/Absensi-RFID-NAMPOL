@@ -59,5 +59,39 @@ public class LogAbsensiService {
             }
         }
     }
+    public boolean sudahAbsenHariIni(String hashedUid, String status) {
+        java.time.LocalDate hariIni = java.time.LocalDate.now();
+        
+        // Menentukan batasan waktu dari jam 00:00:00 sampai 23:59:59 hari ini
+        java.time.LocalDateTime awalHari = hariIni.atStartOfDay();
+        java.time.LocalDateTime akhirHari = hariIni.atTime(java.time.LocalTime.MAX);
+        
+        // KOREKSI TOTAL: Mengubah "hashedUid" menjadi "uidRfid" sesuai dengan kolom di MongoDB Compass Anda
+        org.bson.conversions.Bson filter = com.mongodb.client.model.Filters.and(
+            com.mongodb.client.model.Filters.eq("uidRfid", hashedUid),
+            com.mongodb.client.model.Filters.eq("status", status),
+            com.mongodb.client.model.Filters.gte("waktu", awalHari),
+            com.mongodb.client.model.Filters.lte("waktu", akhirHari)
+        );
+        
+        java.util.List<logabsensi> hasil = logDAO.findMany(filter);
+        return hasil != null && !hasil.isEmpty();
+    }
+
+    
+    // PERBAIKAN: Menyimpan status aktif sistem absensi secara global di memori harian
+    private static String statusSistemAktif = "Masuk"; 
+
+    public static void setStatusSistemAktif(String status) {
+        statusSistemAktif = status;
+    }
+
+    public static String getStatusSistemAktif() {
+        return statusSistemAktif;
+    }
+    
+    // ... (sisa kode simpanLog, setSiswaTidakHadir, dll tetap sama) ...
 }
+
+
 

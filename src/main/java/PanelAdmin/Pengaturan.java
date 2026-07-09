@@ -4,18 +4,30 @@
  */
 package PanelAdmin;
 
+import services.LogAbsensiService;
 /**
  *
  * @author ADVAN
  */
-public class Pengaturan extends javax.swing.JPanel {
+
+public class Pengaturan extends javax.swing.JPanel implements swing.I18nService.I18nChangeListener {
+    private LogAbsensiService absensiService;
 
     /**
      * Creates new form Pengaturan
      */
     public Pengaturan() {
         initComponents();
+        absensiService = new LogAbsensiService();
+        swing.I18nService.registerListener(this);
+        
+        
+        // AMBIL STATUS TERAKHIR: Agar posisi slider tidak ter-reset ke kiri saat pindah halaman
+        String statusTerakhir = services.LogAbsensiService.getStatusSistemAktif();
+        slidingStatusToggle1.setStatusByString(statusTerakhir);
+        onLanguageChanged();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,43 +42,23 @@ public class Pengaturan extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
         jButton2 = new javax.swing.JButton();
+        slidingStatusToggle1 = new swing.SlidingStatusToggle();
+        slidingLanguageToggle1 = new swing.SlidingLanguageToggle();
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("Pengaturan");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(49, 47, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel2.setText("Bahasa Sistem");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 180, -1, -1));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 180, -1, -1));
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel3.setText("Profile");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 250, -1, -1));
-
-        jButton1.setBackground(new java.awt.Color(153, 255, 204));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jButton1.setText("Lihat Profile");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 250, 140, -1));
-
-        jComboBox1.setBackground(new java.awt.Color(153, 255, 204));
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bahasa Indonesia", "Inggris", "Jepang", "China" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 180, 190, -1));
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel3.setText("Status Absensi");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 260, -1, -1));
 
         jButton2.setBackground(new java.awt.Color(255, 0, 0));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -78,6 +70,22 @@ public class Pengaturan extends javax.swing.JPanel {
             }
         });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 570, 433, -1));
+
+        slidingStatusToggle1.setText("slidingStatusToggle1");
+        slidingStatusToggle1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                slidingStatusToggle1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(slidingStatusToggle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 250, 220, 50));
+
+        slidingLanguageToggle1.setText("slidingLanguageToggle2");
+        slidingLanguageToggle1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                slidingLanguageToggle1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(slidingLanguageToggle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 170, 220, 50));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -96,39 +104,18 @@ public class Pengaturan extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-        String bahasaTerpilih = jComboBox1.getSelectedItem().toString();
-        System.out.println("Sistem beralih menggunakan: " + bahasaTerpilih);
-    }//GEN-LAST:event_jComboBox1ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        // Memunculkan kotak dialog informasi administrator aplikasi
-        javax.swing.JOptionPane.showMessageDialog(
-                this, 
-                "=== ADMINISTRATOR PROFILE ===\n\n"
-                + "Nama Pengguna : Admin SEMANGGI\n"
-                + "Hak Akses     : Super Admin / Kiosk Manager\n"
-                + "Status Sistem : Terhubung (MongoDB)", 
-                "Detail Profil Admin", 
-                javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         // 1. Tampilkan konfirmasi logout kepada user
-        int konfirmasi = javax.swing.JOptionPane.showConfirmDialog(
-                this, 
-                "Apakah Anda yakin ingin keluar dari sistem SEMANGGI?", 
-                "Konfirmasi Logout", 
-                javax.swing.JOptionPane.YES_NO_OPTION,
-                javax.swing.JOptionPane.QUESTION_MESSAGE
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(
+            this, 
+            swing.I18nService.get("msg.logout.confirm.text"), 
+            swing.I18nService.get("msg.logout.confirm.title"), // Ini yang akan mengubah judul dialog
+            javax.swing.JOptionPane.YES_NO_OPTION
         );
         
         // 2. Jika user memilih 'Ya'
-        if (konfirmasi == javax.swing.JOptionPane.YES_OPTION) {
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
             // Tutup frame Dashboard utama secara dinamis
             java.awt.Window tWindow = javax.swing.SwingUtilities.getWindowAncestor(this);
             if (tWindow != null) {
@@ -142,14 +129,53 @@ public class Pengaturan extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void slidingStatusToggle1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slidingStatusToggle1ActionPerformed
+        String rawStatus = slidingStatusToggle1.getStatusString(); // "Masuk" atau "Pulang"
+
+        // Tentukan key untuk terjemahan
+        String statusKey = rawStatus.equalsIgnoreCase("Pulang") ? "status.db.pulang" : "status.db.masuk";
+        String statusTerjemahan = swing.I18nService.get(statusKey);
+
+        // Simpan status asli ke database (tetap "Masuk"/"Pulang")
+        services.LogAbsensiService.setStatusSistemAktif(rawStatus);
+
+        // Tampilkan pesan dengan status yang sudah diterjemahkan
+        String pesan = swing.I18nService.get("msg.status.changed") + " " + statusTerjemahan;
+        javax.swing.JOptionPane.showMessageDialog(this, pesan);
+    }//GEN-LAST:event_slidingStatusToggle1ActionPerformed
+
+    private void slidingLanguageToggle1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slidingLanguageToggle1ActionPerformed
+        // 1. Ambil status saat ini
+        String statusBaru = slidingStatusToggle1.getStatusString(); 
+        services.LogAbsensiService.setStatusSistemAktif(statusBaru);
+
+        // 2. Terjemahkan status agar muncul sesuai bahasa yang dipilih
+        String statusKey = statusBaru.equalsIgnoreCase("Pulang") ? "status.db.pulang" : "status.db.masuk";
+        String statusTerjemahan = swing.I18nService.get(statusKey);
+
+        // 3. Gunakan I18nService untuk pesan yang dinamis dan sudah diterjemahkan
+        String pesan = swing.I18nService.get("msg.status.changed") + " " + statusTerjemahan;
+        javax.swing.JOptionPane.showMessageDialog(this, pesan);
+    }//GEN-LAST:event_slidingLanguageToggle1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private swing.SlidingLanguageToggle slidingLanguageToggle1;
+    private swing.SlidingStatusToggle slidingStatusToggle1;
     // End of variables declaration//GEN-END:variables
+    public void onLanguageChanged() {
+        jLabel1.setText(swing.I18nService.get("lbl.sett.title"));
+        jLabel2.setText(swing.I18nService.get("lbl.sett.lang"));
+        jLabel3.setText(swing.I18nService.get("lbl.sett.status"));
+        jButton2.setText(swing.I18nService.get("btn.sett.logout"));
+        slidingStatusToggle1.setLabels(
+            swing.I18nService.get("status.db.masuk"), 
+            swing.I18nService.get("status.db.pulang")
+        );
+    }
 }

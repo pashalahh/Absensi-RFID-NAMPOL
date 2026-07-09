@@ -8,7 +8,7 @@ package PanelAdmin;
  *
  * @author ADVAN
  */
-public class Dashboard extends javax.swing.JPanel {
+public class Dashboard extends javax.swing.JPanel implements swing.I18nService.I18nChangeListener {
     private final javax.swing.JPanel pnlLogDinamis = new javax.swing.JPanel();
 
     /**
@@ -16,27 +16,24 @@ public class Dashboard extends javax.swing.JPanel {
      */
     public Dashboard() {
         initComponents();
+        swing.I18nService.registerListener(this);
         
-        // 1. Format JSpinner ke tanggal Indonesia
-        javax.swing.JSpinner.DateEditor editor = new javax.swing.JSpinner.DateEditor(jSpinner1, "dd-MM-yyyy");
-        jSpinner1.setEditor(editor);
-        
-        // 2. Setup kontainer log di dalam JScrollPane1
+        // Setup kontainer log
         pnlLogDinamis.setLayout(new javax.swing.BoxLayout(pnlLogDinamis, javax.swing.BoxLayout.Y_AXIS));
         pnlLogDinamis.setBackground(java.awt.Color.WHITE);
         jScrollPane1.setViewportView(pnlLogDinamis);
-        jScrollPane1.setBorder(null);
-        jScrollPane1.getViewport().setBackground(java.awt.Color.WHITE);
         
-        // 3. Listener saat tanggal spinner berubah
-        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                sinkronisasiSeluruhDashboard();
-            }
-        });
-        
-        // Load data pertama kali
-        sinkronisasiSeluruhDashboard();
+        jSpinner1.addChangeListener(evt -> sinkronisasiSeluruhDashboard());
+        onLanguageChanged();
+    }
+    public void onLanguageChanged() {
+        jLabel1.setText(swing.I18nService.get("lbl.dash.total.mhs"));
+        jLabel3.setText(swing.I18nService.get("lbl.dash.hadir.hariini"));
+        jLabel5.setText(swing.I18nService.get("lbl.dash.pulang.hariini"));
+        jLabel6.setText(swing.I18nService.get("lbl.dash.tidak.absen"));
+        jLabel4.setText(swing.I18nService.get("lbl.dash.header.chart"));
+        jLabel7.setText(swing.I18nService.get("lbl.dash.header.activity"));
+        sinkronisasiSeluruhDashboard(); 
     }
 
     /**
@@ -274,114 +271,87 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JPanel pnlGrafikmingguan;
     private javax.swing.JPanel pnlGrafikmingguan1;
     // End of variables declaration//GEN-END:variables
-private void sinkronisasiSeluruhDashboard() {
-        if (jSpinner1.getValue() == null) return;
-        
-        try {
-            dao.GenericDAO<objects.mahasiswa> mDAO = new dao.GenericDAO<>("mahasiswa", objects.mahasiswa.class);
-            dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
-            
-            // 1. Hitung total mahasiswa
-            java.util.List<objects.mahasiswa> semuaMhs = mDAO.findAll();
-            long totalMhs = (semuaMhs != null) ? semuaMhs.size() : 0;
-            lbltotalmahasiswa.setText(String.valueOf(totalMhs));
-            
-            // 2. Filter Tanggal Hari Ini untuk MongoDB
-            java.util.Date dateSelected = (java.util.Date) jSpinner1.getValue();
-            java.time.LocalDate lokalTgl = dateSelected.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-            java.util.Date startHari = java.util.Date.from(lokalTgl.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
-            java.util.Date endHari = java.util.Date.from(lokalTgl.atTime(23, 59, 59).atZone(java.time.ZoneId.systemDefault()).toInstant());
-            
-            org.bson.conversions.Bson filterHariIni = com.mongodb.client.model.Filters.and(
-                com.mongodb.client.model.Filters.gte("tanggal", startHari),
-                com.mongodb.client.model.Filters.lte("tanggal", endHari)
-            );
-            java.util.List<objects.logabsensi> logHariTerpilih = logDAO.findMany(filterHariIni);
-            
-            // 3. Hitung Statistik Box Atas
-            long totalHadir = 0, totalTerlambat = 0;
-            if (logHariTerpilih != null) {
-                for (objects.logabsensi log : logHariTerpilih) {
-                    if (log.getStatus().equalsIgnoreCase("Tepat Waktu")) totalHadir++;
-                    else if (log.getStatus().startsWith("Terlambat")) totalTerlambat++;
-                }
-            }
-            long tidakAbsen = totalMhs - (totalHadir + totalTerlambat);
-            if (tidakAbsen < 0) tidakAbsen = 0;
-            
-            lblhadirharian.setText(String.valueOf(totalHadir));
-            lblterlambat.setText(String.valueOf(totalTerlambat));
-            lbltidakabsen.setText(String.valueOf(tidakAbsen));
-            
-            // 4. Render Log Aktivitas Terbaru (Nama & Status Saja)
-            pnlLogDinamis.removeAll();
-            if (logHariTerpilih != null && !logHariTerpilih.isEmpty()) {
-                logHariTerpilih.sort((l1, l2) -> l2.getWaktu().compareTo(l1.getWaktu())); // Terbaru di atas
-                
-                int counter = 0;
-                for (objects.logabsensi log : logHariTerpilih) {
-                    if (counter >= 6) break; // Maksimal 6 baris
-                    
-                    javax.swing.JPanel rowCard = new javax.swing.JPanel(new java.awt.BorderLayout(10, 0));
-                    rowCard.setBackground(java.awt.Color.WHITE);
-                    rowCard.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                        javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(240, 240, 240)),
-                        javax.swing.BorderFactory.createEmptyBorder(8, 15, 8, 15)
-                    ));
-                    rowCard.setMaximumSize(new java.awt.Dimension(280, 45));
-                    
-                    javax.swing.JLabel lblNama = new javax.swing.JLabel(log.getNama());
-                    lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
-                    
-                    javax.swing.JLabel lblStatus = new javax.swing.JLabel(log.getStatus().toUpperCase());
-                    lblStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 10));
-                    lblStatus.setForeground(log.getStatus().contains("Terlambat") ? new java.awt.Color(220, 53, 69) : new java.awt.Color(40, 167, 69));
-                    
-                    rowCard.add(lblNama, java.awt.BorderLayout.WEST);
-                    rowCard.add(lblStatus, java.awt.BorderLayout.EAST);
-                    pnlLogDinamis.add(rowCard);
-                    counter++;
-                }
-                pnlLogDinamis.setPreferredSize(new java.awt.Dimension(0, counter * 45));
-            } else {
-                pnlLogDinamis.add(new javax.swing.JLabel(" Belum ada aktivitas scan harian."));
-            }
-            
-            // 5. Render Grafik Batang
-            tampilkanGrafikBatang(totalHadir, totalTerlambat, tidakAbsen);
-            
-            // Refresh Frame Grafis
-            pnlLogDinamis.revalidate(); pnlLogDinamis.repaint();
-            jScrollPane1.revalidate(); jScrollPane1.repaint();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+private String getStatusLabel(String statusAsli) {
+        if (statusAsli == null) return "";
+        if (statusAsli.equalsIgnoreCase("Masuk")) return swing.I18nService.get("status.db.masuk");
+        if (statusAsli.equalsIgnoreCase("Pulang")) return swing.I18nService.get("status.db.pulang");
+        return statusAsli;
     }
-private void tampilkanGrafikBatang(long hadir, long terlambat, long alpa) {
+
+    private void sinkronisasiSeluruhDashboard() {
+        if (jSpinner1.getValue() == null) return;
+    try {
+        dao.GenericDAO<objects.mahasiswa> mDAO = new dao.GenericDAO<>("mahasiswa", objects.mahasiswa.class);
+        dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
+
+        long totalMhs = mDAO.findAll() != null ? mDAO.findAll().size() : 0;
+        lbltotalmahasiswa.setText(String.valueOf(totalMhs));
+
+        java.util.Date dateSelected = (java.util.Date) jSpinner1.getValue();
+        java.time.LocalDate lokalTgl = dateSelected.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        java.util.Date startHari = java.util.Date.from(lokalTgl.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+        java.util.Date endHari = java.util.Date.from(lokalTgl.atTime(23, 59, 59).atZone(java.time.ZoneId.systemDefault()).toInstant());
+
+        org.bson.conversions.Bson filter = com.mongodb.client.model.Filters.and(
+            com.mongodb.client.model.Filters.gte("waktu", startHari),
+            com.mongodb.client.model.Filters.lte("waktu", endHari)
+        );
+        java.util.List<objects.logabsensi> logList = logDAO.findMany(filter);
+
+        long totalMasuk = 0, totalPulang = 0;
+        pnlLogDinamis.removeAll();
+
+        if (logList != null && !logList.isEmpty()) {
+            for (objects.logabsensi log : logList) {
+                // Perhitungan Statistik
+                if (log.getStatus().equalsIgnoreCase("Masuk")) totalMasuk++;
+                else if (log.getStatus().equalsIgnoreCase("Pulang")) totalPulang++;
+
+                // Render List
+                javax.swing.JPanel rowCard = new javax.swing.JPanel(new java.awt.BorderLayout());
+                rowCard.setOpaque(false);
+                rowCard.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 5, 2, 5));
+                
+                javax.swing.JLabel lblNama = new javax.swing.JLabel(log.getNama());
+                javax.swing.JLabel lblStatus = new javax.swing.JLabel(getStatusLabel(log.getStatus()).toUpperCase());
+                
+                lblStatus.setForeground(log.getStatus().equalsIgnoreCase("Pulang") ? java.awt.Color.RED : java.awt.Color.GREEN);
+                
+                rowCard.add(lblNama, java.awt.BorderLayout.WEST);
+                rowCard.add(lblStatus, java.awt.BorderLayout.EAST);
+                pnlLogDinamis.add(rowCard);
+            }
+        } else {
+            pnlLogDinamis.add(new javax.swing.JLabel(" " + swing.I18nService.get("lbl.dash.log.empty")));
+        }
+
+        lblhadirharian.setText(String.valueOf(totalMasuk));
+        lblterlambat.setText(String.valueOf(totalPulang));
+        lbltidakabsen.setText(String.valueOf(Math.max(0, totalMhs - totalMasuk)));
+
+        tampilkanGrafikBatang(totalMasuk, totalPulang, Math.max(0, totalMhs - totalMasuk));
+        pnlLogDinamis.revalidate();
+        pnlLogDinamis.repaint();
+    } catch (Exception e) { e.printStackTrace(); }
+}
+
+    private void tampilkanGrafikBatang(long hadir, long pulang, long alpa) {
         org.jfree.data.category.DefaultCategoryDataset dataset = new org.jfree.data.category.DefaultCategoryDataset();
-        dataset.setValue(hadir, "Mahasiswa", "Tepat Waktu");
-        dataset.setValue(terlambat, "Mahasiswa", "Terlambat");
-        dataset.setValue(alpa, "Mahasiswa", "Tidak Absen");
-        
+
+        // MENGGUNAKAN KEY i18n AGAR BISA BERUBAH BAHASA
+        dataset.setValue(hadir, "Mhs", swing.I18nService.get("status.db.masuk"));
+        dataset.setValue(pulang, "Mhs", swing.I18nService.get("status.db.pulang"));
+        dataset.setValue(alpa, "Mhs", swing.I18nService.get("status.db.unregistered"));
+
         org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createBarChart(
-                null, "Kategori Status", "Jumlah Orang", dataset,
+                null, null, null, dataset,
                 org.jfree.chart.plot.PlotOrientation.VERTICAL, false, true, false
         );
-        
-        // Desain Kosmetik Grafik Batang
-        org.jfree.chart.plot.CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(java.awt.Color.WHITE);
-        plot.setRangeGridlinePaint(new java.awt.Color(230, 230, 230));
-        
-        org.jfree.chart.renderer.category.BarRenderer renderer = (org.jfree.chart.renderer.category.BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new java.awt.Color(51, 204, 153)); // Hijau Pastel
-        
-        org.jfree.chart.ChartPanel chartPanel = new org.jfree.chart.ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(pnlGrafikmingguan.getWidth(), pnlGrafikmingguan.getHeight()));
-        
+
+        // Tetap gunakan desain Absolute yang rapi
         pnlGrafikmingguan.removeAll();
-        pnlGrafikmingguan.setLayout(new java.awt.BorderLayout());
-        pnlGrafikmingguan.add(chartPanel, java.awt.BorderLayout.CENTER);
+        pnlGrafikmingguan.setLayout(new java.awt.BorderLayout()); // BorderLayout hanya untuk ChartPanel agar memenuhi area
+        pnlGrafikmingguan.add(new org.jfree.chart.ChartPanel(chart));
         pnlGrafikmingguan.revalidate();
         pnlGrafikmingguan.repaint();
     }

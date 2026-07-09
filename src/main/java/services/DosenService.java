@@ -46,7 +46,7 @@ public class DosenService {
         // Otomatis lakukan hashing SHA-256 pada password mentah sebelum disimpan
         d.setPassword(Security.getHash(d.getPassword(), Security.SHA_256));
         DAO.save(d);
-        JOptionPane.showMessageDialog(null, "Lecturer successfully added!");
+        JOptionPane.showMessageDialog(null, swing.I18nService.get("msg.dsn.success"));
     }
     
     /**
@@ -98,13 +98,13 @@ public class DosenService {
                         BorderFactory.createEmptyBorder(15, 15, 15, 15)
                 ));
 
-                JLabel lblNip = new JLabel("NIP Dosen: " + d.getNipDosen());
+                JLabel lblNip = new JLabel(swing.I18nService.get("lbl.dsn.nip") + ": " + d.getNipDosen());
                 lblNip.setForeground(Color.BLACK);
 
-                JLabel lblNama = new JLabel("Nama: " + d.getNama());
+                JLabel lblNama = new JLabel(swing.I18nService.get("lbl.dsn.nama") + ": " + d.getNama());
                 lblNama.setForeground(Color.BLACK);
 
-                JLabel lblUser = new JLabel("Username: " + d.getUsername());
+                JLabel lblUser = new JLabel(swing.I18nService.get("lbl.dsn.username") + ": " + d.getUsername());
                 lblUser.setForeground(Color.BLACK);
 
                 // Membuat area tombol aksi aksi Edit & Delete
@@ -112,6 +112,7 @@ public class DosenService {
                 controlPanel.setBackground(Color.WHITE);
 
                 JButton tombolEdit = new JButton("Edit");
+                tombolEdit.setText(swing.I18nService.get("btn.dsn.edit"));
                 tombolEdit.setBackground(Color.ORANGE);
                 tombolEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 tombolEdit.addActionListener((ActionEvent e) -> {
@@ -124,20 +125,21 @@ public class DosenService {
                 });
 
                 JButton tombolDelete = new JButton("Delete");
+                tombolDelete.setText(swing.I18nService.get("btn.dsn.delete"));
                 tombolDelete.setBackground(Color.RED);
                 tombolDelete.setForeground(Color.WHITE);
                 tombolDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 tombolDelete.addActionListener((ActionEvent e) -> {
                     Object[] options = {"Ya, Hapus", "Batal"};
                     int choice = JOptionPane.showOptionDialog(
-                            null,
-                            "Apakah Anda yakin ingin menghapus data " + d.getNama() + "?",
-                            "Konfirmasi Pengelolaan",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            options,
-                            options[0]
+                        null,
+                        swing.I18nService.get("msg.dsn.delete.confirm") + " " + d.getNama() + "?",
+                        swing.I18nService.get("msg.dsn.delete.title"),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        new Object[]{swing.I18nService.get("btn.yes"), swing.I18nService.get("btn.no")},
+                        swing.I18nService.get("btn.yes")
                     );
 
                     if (choice == JOptionPane.YES_OPTION) {
@@ -207,7 +209,7 @@ public class DosenService {
 
             DAO.update(filter, newD);
             DataDosen.showData("");
-            JOptionPane.showMessageDialog(null, "Lecturer data successfully updated!");
+            JOptionPane.showMessageDialog(null, swing.I18nService.get("msg.dsn.success"));
         }
     }
 
@@ -220,6 +222,6 @@ public class DosenService {
         Bson filter = Filters.eq("nipDosen", nip);
         DAO.delete(filter);
         DataDosen.showData("");
-        JOptionPane.showMessageDialog(null, "Lecturer data successfully deleted.");
+        JOptionPane.showMessageDialog(null, swing.I18nService.get("msg.dsn.success"));
     }
 }

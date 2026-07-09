@@ -81,100 +81,101 @@ public class MahasiswaService {
      * @param key
      */
     public void tampilMahasiswa(JPanel panelTarget, String key) {
-        //1. 
-        // Menampilkan data berdasarkan request
-        // key "null/kosong" = get all data
-        // key "filled" = get specific data
-
         List<mahasiswa> daftarMahasiswa;
         if (key.isEmpty()) {
-            //Mengambil data dari database menggunakan GenericDAO
             daftarMahasiswa = DAO.findAll();
         } else {
-            //Mengambil data dari database menggunakan GenericDAO
-            //berdasarkan kata kunci yang diketik
             daftarMahasiswa = cariMahasiswa(key);
         }
-        // 2. Membersihkan panel target utama sebelum memuat data baru
+        
         panelTarget.removeAll();
-
-        // Mengubah layout panel target menjadi BorderLayout
         panelTarget.setLayout(new BorderLayout());
-        // Mengatur warna background utama menjadi Hijau
         panelTarget.setBackground(new Color(153, 255, 204));
 
-        // Membuat panel grid khusus untuk menampung kotak/card
         JPanel gridPanel = new JPanel(new GridLayout(0, 3, 10, 10));
-        gridPanel.setOpaque(false); // Transparan agar warna biru panelTarget terlihat
-        gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Memberi jarak dari tepi layar
+        gridPanel.setOpaque(false);
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        // 3. Iterasi data dan menambahkannya ke panel grid
         try {
             for (mahasiswa m : daftarMahasiswa) {
-                // 2. MENGUBAH LAYOUT JADI 5 BARIS 1 KOLOM AGAR TEKS TERURUT KE BAWAH
-                // (4 Label + 1 Control Panel Tombol = 5 Komponen)
                 JPanel cardPanel = new JPanel(new GridLayout(5, 1, 0, 5));
-                cardPanel.setBackground(Color.WHITE); // Warna background orange
+                cardPanel.setBackground(Color.WHITE);
 
-                // Memberikan garis tepi tipis membulat (rounded) dan padding/jarak ke dalam
                 cardPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.MAGENTA, 1, true),
                         BorderFactory.createEmptyBorder(15, 15, 15, 15)
                 ));
 
-                // Membuat Label Nama & Set warna teks jadi Putih
-                JLabel lblNama = new JLabel("Nama: " + m.getNama());
+                // Dekripsi data untuk ditampilkan di kartu visual GUI
+                String nimDecrypted = "";
+                String telpDecrypted = "";
+                try {
+                    nimDecrypted = EncryptionUtils.decrypt(m.getNimMahasiswa());
+                    telpDecrypted = EncryptionUtils.decrypt(m.getNoTelp());
+                } catch (Exception e) {
+                    // Jika data kosong/corrupt, biarkan kosong
+                }
+
+                JLabel lblNama = new JLabel(swing.I18nService.get("lbl.mhs.nama") + ": " + m.getNama());
                 lblNama.setForeground(Color.BLACK);
 
-                // Membuat Label ID Karyawan & Set warna teks jadi Putih
-                JLabel lblNim = new JLabel("NIM Mahasiswa: " + EncryptionUtils.decrypt(m.getNimMahasiswa()));
+                JLabel lblNim = new JLabel(swing.I18nService.get("lbl.mhs.nim") + ": " + nimDecrypted);
                 lblNim.setForeground(Color.BLACK);
 
-                // Membuat Label Departemen & Set warna teks jadi Putih
-                JLabel lblKls = new JLabel("Kelas: " + m.getKelas());
+                JLabel lblKls = new JLabel(swing.I18nService.get("lbl.mhs.kelas") + ": " + m.getKelas());
                 lblKls.setForeground(Color.BLACK);
                 
-                JLabel lblTlp = new JLabel("No Telpon: " + EncryptionUtils.decrypt(m.getNoTelp()));
+                JLabel lblTlp = new JLabel(swing.I18nService.get("lbl.mhs.notelp") + ": " + telpDecrypted);
                 lblTlp.setForeground(Color.BLACK);
 
-                // Membuat panel kontrol 1 baris 2 kolom, berisi tombol edit dan hapus
                 JPanel controlPanel = new JPanel(new GridLayout(1, 2, 20, 15));
                 controlPanel.setBackground(Color.WHITE);
 
                 JButton tombolEdit = new JButton("Edit");
+                tombolEdit.setText(swing.I18nService.get("btn.mhs.update"));
                 tombolEdit.setBackground(Color.ORANGE);
                 tombolEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                
+                // Variabel efektif final untuk action listener
+                final String finalNim = nimDecrypted;
+                final String finalTelp = telpDecrypted;
+                
                 tombolEdit.addActionListener((ActionEvent e) -> {
                     DataMahasiswa.txtUID.setText(m.getUidRfid());
-                    DataMahasiswa.txtNim.setText( EncryptionUtils.decrypt(m.getNimMahasiswa()));
+                    DataMahasiswa.txtNim.setText(finalNim);
                     DataMahasiswa.txtNim.setEnabled(false); 
                     DataMahasiswa.txtNama.setText(m.getNama());
                     DataMahasiswa.txtKls.setSelectedItem(m.getKelas());
-                    DataMahasiswa.txtNoTelp.setText( EncryptionUtils.decrypt(m.getNoTelp()));
+                    DataMahasiswa.txtNoTelp.setText(finalTelp);
                     DataMahasiswa.btnUpdate.setEnabled(true);
                     DataMahasiswa.btnSave.setEnabled(false); 
                 });
+
                 JButton tombolDelete = new JButton("Delete");
+                tombolDelete.setText("Delete");
                 tombolDelete.setBackground(Color.RED);
                 tombolDelete.setForeground(Color.WHITE);
                 tombolDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 tombolDelete.addActionListener((ActionEvent e) -> {
                     Object[] options = {"Ya, Hapus", "Batal"};
                     int choice = JOptionPane.showOptionDialog(
-                            null, // Parent component
-                            "Apakah Anda ingin menyimpan data "+m.getNama()+"?", // Message
-                            "Konfirmasi Pengelolaan", // Title
-                            JOptionPane.YES_NO_OPTION, // Option type
-                            JOptionPane.QUESTION_MESSAGE, // Message type
-                            null, // Custom icon (null uses default)
-                            options, // The array of custom button text
-                            options[0] // Default button focused
+                            null, 
+                            swing.I18nService.get("msg.mhs.delete.confirm") + " " + m.getNama() + "?", 
+                            swing.I18nService.get("lbl.mhs.title"), 
+                            JOptionPane.YES_NO_OPTION, 
+                            JOptionPane.QUESTION_MESSAGE, 
+                            null, 
+                            new Object[]{swing.I18nService.get("btn.yes"), swing.I18nService.get("btn.no")}, 
+                            swing.I18nService.get("btn.yes")
                     );
 
-                    switch (choice) {
-                        case JOptionPane.YES_OPTION -> hapusMahasiswa(m.getNimMahasiswa());
-                        case JOptionPane.NO_OPTION -> System.out.println("User memilih: Batal");
-                        default -> {
+                    if (choice == JOptionPane.YES_OPTION) {
+                        // JIKA KOSONG: Cegat langsung dan kirim tanda "KOSONG_TERPAKSA" seperti cara data dosen
+                        if (finalNim.isEmpty() || m.getNama() == null || m.getNama().trim().isEmpty()) {
+                            hapusMahasiswa("KOSONG_TERPAKSA");
+                        } else {
+                            // Kirim NIM dalam bentuk plain text biasa, sama persis dengan d.getNipDosen()
+                            hapusMahasiswa(finalNim);
                         }
                     }
                 });
@@ -182,21 +183,16 @@ public class MahasiswaService {
                 controlPanel.add(tombolEdit);
                 controlPanel.add(tombolDelete);
 
-                // Memasukkan label ke dalam cardPanel (box orange)
                 cardPanel.add(lblNama);
                 cardPanel.add(lblNim);
-                cardPanel.add(lblKls);
+                cardPanel.add(cardPanel.add(lblKls));
                 cardPanel.add(lblTlp);
                 cardPanel.add(controlPanel);
 
-                // Memasukkan cardPanel utuh ke dalam gridPanel
                 gridPanel.add(cardPanel);
             }
 
-            // Memasukkan gridPanel ke bagian ATAS (NORTH) dari panel target.
             panelTarget.add(gridPanel, BorderLayout.NORTH);
-
-            // 4. Me-refresh panel agar perubahan muncul di GUI
             panelTarget.revalidate();
             panelTarget.repaint();
         } catch (Exception e) {
@@ -246,8 +242,7 @@ public class MahasiswaService {
         DAO.update(filter, newm);
 
         DataMahasiswa.showData("");
-        JOptionPane.showMessageDialog(null,
-                "Data berhasil diperbarui!");
+        JOptionPane.showMessageDialog(null, swing.I18nService.get("msg.update.success"));
     }
 }
 
@@ -257,10 +252,23 @@ public class MahasiswaService {
      * @param idK
      */
     public void hapusMahasiswa(String idK) {
-        Bson filter = Filters.eq("nimMahasiswa",EncryptionUtils.encrypt(idK));
-        DAO.delete(filter); // Menggunakan deleteOne [6]
+        Bson filter;
+        
+        // Mengikuti struktur logika DosenService untuk mendeteksi kartu hantu/kosong
+        if (idK == null || idK.trim().isEmpty() || idK.equals("KOSONG_TERPAKSA")) {
+            filter = Filters.or(
+                Filters.eq("nimMahasiswa", ""),
+                Filters.eq("nama", ""),
+                Filters.exists("nimMahasiswa", false)
+            );
+        } else {
+            // Lakukan enkripsi di sini sebelum menembak database MongoDB
+            filter = Filters.eq("nimMahasiswa", EncryptionUtils.encrypt(idK));
+        }
+        
+        DAO.delete(filter); // Menggunakan deleteOne
         DataMahasiswa.showData("");
-        JOptionPane.showMessageDialog(null, "Data Mahasiswa berhasil dihapus.");
+        JOptionPane.showMessageDialog(null, swing.I18nService.get("msg.delete.success"));
     }
     
     /**

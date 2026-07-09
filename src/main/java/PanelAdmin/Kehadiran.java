@@ -8,8 +8,7 @@ package PanelAdmin;
  *
  * @author ADVAN
  */
-public class Kehadiran extends javax.swing.JPanel {
-
+public class Kehadiran extends javax.swing.JPanel implements swing.I18nService.I18nChangeListener {
     /**
      * Creates new form Kehadiran
      */
@@ -33,6 +32,9 @@ public class Kehadiran extends javax.swing.JPanel {
         // 4. Paksa UI untuk menggambar ulang di awal agar data langsung nongol
         this.revalidate();
         this.repaint();
+        // DAFTARKAN PANEL INI
+        swing.I18nService.registerListener(this);   
+        onLanguageChanged();
     }
 
     private void eksekusiFilterLaporan() {
@@ -49,6 +51,18 @@ public class Kehadiran extends javax.swing.JPanel {
             // Jalankan query filter ke database
             muatLaporanBerdasarkanTanggal(tglMulai, tglSelesai);
         }
+    }
+    public void onLanguageChanged() {
+        jLabel1.setText(swing.I18nService.get("lbl.rpt.total.scan"));
+        jLabel3.setText(swing.I18nService.get("lbl.rpt.hadir"));
+        jLabel5.setText(swing.I18nService.get("lbl.rpt.pulang"));
+        jLabel6.setText(swing.I18nService.get("lbl.rpt.tidak.hadir"));
+        jLabel10.setText(swing.I18nService.get("lbl.rpt.range"));
+        jLabel7.setText(swing.I18nService.get("lbl.rpt.log.title"));
+        btnAutoRefresh4.setText(swing.I18nService.get("btn.rpt.refresh"));
+        
+        // Segarkan database agar isian teks di dalam kartu log laporan ikut terjemah
+        eksekusiFilterLaporan();
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -385,21 +399,23 @@ public void sinkronisasiStatistikDashboard() {
             
             java.time.LocalDate hariIni = java.time.LocalDate.now();
             
+            // KOREKSI FILTER: Mencari status real "Masuk" hari ini
             org.bson.conversions.Bson filterHadir = com.mongodb.client.model.Filters.and(
                 com.mongodb.client.model.Filters.eq("tanggal", hariIni),
-                com.mongodb.client.model.Filters.eq("status", "Tepat Waktu")
+                com.mongodb.client.model.Filters.eq("status", "Masuk")
             );
             java.util.List<objects.logabsensi> listHadir = logDAO.findMany(filterHadir);
             long totalHadir = (listHadir != null) ? listHadir.size() : 0;
             
+            // KOREKSI FILTER: Mencari status real "Pulang" hari ini
             org.bson.conversions.Bson filterTerlambat = com.mongodb.client.model.Filters.and(
                 com.mongodb.client.model.Filters.eq("tanggal", hariIni),
-                com.mongodb.client.model.Filters.regex("status", "^Terlambat")
+                com.mongodb.client.model.Filters.eq("status", "Pulang")
             );
             java.util.List<objects.logabsensi> listTerlambat = logDAO.findMany(filterTerlambat);
             long totalTerlambat = (listTerlambat != null) ? listTerlambat.size() : 0;
             
-            long tidakAbsen = totalMhs - (totalHadir + totalTerlambat);
+            long tidakAbsen = totalMhs - totalHadir;
             if (tidakAbsen < 0) tidakAbsen = 0;
             
             lblhadir.setText(String.valueOf(totalHadir));
@@ -407,145 +423,141 @@ public void sinkronisasiStatistikDashboard() {
             lbltidakhadir.setText(String.valueOf(tidakAbsen));
             
         } catch (Exception e) {
-            System.out.println("Gagal memuat statistik dashboard hari ini: " + e.getMessage());
+            System.out.println("Gagal memuat statistik dashboard harian: " + e.getMessage());
         }
     }
 
     public void muatLaporanBerdasarkanTanggal(java.time.LocalDate tglMulai, java.time.LocalDate tglSelesai) {
         try {
-            dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
+        dao.GenericDAO<objects.logabsensi> logDAO = new dao.GenericDAO<>("log_absensi", objects.logabsensi.class);
+        
+        java.util.Date dateMulai = java.util.Date.from(tglMulai.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+        java.util.Date dateSelesai = java.util.Date.from(tglSelesai.atTime(23, 59, 59).atZone(java.time.ZoneId.systemDefault()).toInstant());
+        
+        org.bson.conversions.Bson filterJangkauan = com.mongodb.client.model.Filters.and(
+            com.mongodb.client.model.Filters.gte("waktu", dateMulai),
+            com.mongodb.client.model.Filters.lte("waktu", dateSelesai)
+        );
+        
+        java.util.List<objects.logabsensi> daftarLog = logDAO.findMany(filterJangkauan);
+        
+        long scanCount = 0;
+        long hadirCount = 0;
+        long lambatCount = 0;
+        long alpaCount = 0;
+        
+        jPanel11.removeAll(); 
+        
+        jScrollPane1.setBorder(null);
+        jScrollPane1.setOpaque(false);
+        jScrollPane1.getViewport().setOpaque(false);
+        
+        if (daftarLog != null && !daftarLog.isEmpty()) {
+            daftarLog.sort((log1, log2) -> {
+                if (log1.getWaktu() == null || log2.getWaktu() == null) return 0;
+                return log2.getWaktu().compareTo(log1.getWaktu());
+            });
             
-            java.util.Date dateMulai = java.util.Date.from(tglMulai.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
-            java.util.Date dateSelesai = java.util.Date.from(tglSelesai.atTime(23, 59, 59).atZone(java.time.ZoneId.systemDefault()).toInstant());
+            java.time.format.DateTimeFormatter tglFormat = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
             
-            org.bson.conversions.Bson filterJangkauan = com.mongodb.client.model.Filters.and(
-                com.mongodb.client.model.Filters.gte("tanggal", dateMulai),
-                com.mongodb.client.model.Filters.lte("tanggal", dateSelesai)
-            );
-            
-            java.util.List<objects.logabsensi> daftarLog = logDAO.findMany(filterJangkauan);
-            
-            long scanCount = 0;
-            long hadirCount = 0;
-            long lambatCount = 0;
-            long alpaCount = 0;
-            
-            // 1. Bersihkan kontainer kartu log
-            jPanel11.removeAll(); 
-            
-            // Konfigurasi ScrollPane bawaan NetBeans agar transparan dan bersih
-            jScrollPane1.setBorder(null);
-            jScrollPane1.setOpaque(false);
-            jScrollPane1.getViewport().setOpaque(false);
-            
-            if (daftarLog != null && !daftarLog.isEmpty()) {
-                // Urutkan data berdasarkan waktu terbaru (Descending)
-                daftarLog.sort((log1, log2) -> {
-                    if (log1.getWaktu() == null || log2.getWaktu() == null) return 0;
-                    return log2.getWaktu().compareTo(log1.getWaktu());
-                });
+            for (objects.logabsensi log : daftarLog) {
+                scanCount++;
                 
-                java.time.format.DateTimeFormatter tglFormat = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                
-                for (objects.logabsensi log : daftarLog) {
-                    scanCount++;
-                    
-                    if (log.getStatus().equalsIgnoreCase("Tepat Waktu")) {
-                        hadirCount++;
-                    } else if (log.getStatus().startsWith("Terlambat")) {
-                        lambatCount++;
-                    } else if (log.getStatus().equalsIgnoreCase("Tidak Hadir")) {
-                        alpaCount++;
-                    }
-                    
-                    String jamAbsen = "--:--";
-                    if (log.getWaktu() != null) {
-                        jamAbsen = log.getWaktu().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
-                    }
-                    
-                    String stringTanggal = log.getTanggal().format(tglFormat);
-                    
-                    // --- Desain Kartu Wrapper (Padding kanan-kiri agar melayang dari tepi) ---
-                    javax.swing.JPanel wrapperCard = new javax.swing.JPanel();
-                    wrapperCard.setLayout(new java.awt.BorderLayout());
-                    wrapperCard.setOpaque(false);
-                    wrapperCard.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 10, 20));
-                    wrapperCard.setMaximumSize(new java.awt.Dimension(1019, 75)); 
-                    
-                    // --- Desain Kartu Putih Utama ---
-                    javax.swing.JPanel rowCard = new javax.swing.JPanel();
-                    rowCard.setLayout(new java.awt.BorderLayout(15, 0));
-                    rowCard.setBackground(java.awt.Color.WHITE);
-                    rowCard.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                        javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(220, 235, 230)),
-                        javax.swing.BorderFactory.createEmptyBorder(12, 20, 12, 20)
-                    ));
-                    
-                    javax.swing.JPanel leftPanel = new javax.swing.JPanel();
-                    leftPanel.setLayout(new javax.swing.BoxLayout(leftPanel, javax.swing.BoxLayout.Y_AXIS));
-                    leftPanel.setBackground(java.awt.Color.WHITE);
-                    
-                    javax.swing.JLabel lblNama = new javax.swing.JLabel(log.getNama());
-                    lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
-                    lblNama.setForeground(new java.awt.Color(40, 40, 40));
-                    
-                    javax.swing.JLabel lblDetail = new javax.swing.JLabel("Tanggal: " + stringTanggal + "   |   Jam: " + jamAbsen);
-                    lblDetail.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
-                    lblDetail.setForeground(java.awt.Color.GRAY);
-                    
-                    leftPanel.add(lblNama);
-                    leftPanel.add(javax.swing.Box.createVerticalStrut(2));
-                    leftPanel.add(lblDetail);
-                    
-                    javax.swing.JLabel lblBadgeStatus = new javax.swing.JLabel("  " + log.getStatus().toUpperCase() + "  ");
-                    lblBadgeStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 11));
-                    lblBadgeStatus.setOpaque(true);
-                    lblBadgeStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                    
-                    if (log.getStatus().contains("Terlambat")) {
-                        lblBadgeStatus.setBackground(new java.awt.Color(255, 230, 230));
-                        lblBadgeStatus.setForeground(new java.awt.Color(200, 0, 0));
-                    } else if (log.getStatus().equals("Tidak Hadir")) {
-                        lblBadgeStatus.setBackground(java.awt.Color.LIGHT_GRAY);
-                        lblBadgeStatus.setForeground(java.awt.Color.DARK_GRAY);
-                    } else {
-                        lblBadgeStatus.setBackground(new java.awt.Color(230, 245, 235));
-                        lblBadgeStatus.setForeground(new java.awt.Color(0, 130, 40));
-                    }
-                    
-                    rowCard.add(leftPanel, java.awt.BorderLayout.WEST);
-                    rowCard.add(lblBadgeStatus, java.awt.BorderLayout.EAST);
-                    
-                    wrapperCard.add(rowCard, java.awt.BorderLayout.CENTER);
-                    jPanel11.add(wrapperCard);
+                if (log.getStatus().equalsIgnoreCase("Masuk")) {
+                    hadirCount++;
+                } else if (log.getStatus().equalsIgnoreCase("Pulang")) {
+                    lambatCount++;
+                } else if (log.getStatus().equalsIgnoreCase("Tidak Hadir")) {
+                    alpaCount++;
                 }
                 
-                // PERBAIKAN LEBAR: Menggunakan lebar jPanel7 dikurangi margin agar ukuran card tidak 0
-                int totalTinggiPanel = daftarLog.size() * 85; 
-                jPanel11.setPreferredSize(new java.awt.Dimension(jPanel7.getWidth() - 30, totalTinggiPanel));
+                String jamAbsen = "--:--";
+                if (log.getWaktu() != null) {
+                    jamAbsen = log.getWaktu().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+                }
                 
-            } else {
-                javax.swing.JPanel emptyCard = new javax.swing.JPanel();
-                emptyCard.setOpaque(false);
-                emptyCard.add(new javax.swing.JLabel("Tidak ada data absensi pada rentang tanggal ini."));
-                jPanel11.add(emptyCard);
+                String stringTanggal = log.getTanggal().format(tglFormat);
+                
+                // LOGIKA TERJEMAHAN STATUS BARU
+                String statusLog = log.getStatus();
+                String statusKey = statusLog.equalsIgnoreCase("Pulang") ? "status.db.pulang" : 
+                                  (statusLog.equalsIgnoreCase("Tidak Hadir") ? "lbl.rpt.tidak.hadir" : "status.db.masuk");
+                String statusTeks = swing.I18nService.get(statusKey);
+                
+                javax.swing.JPanel wrapperCard = new javax.swing.JPanel();
+                wrapperCard.setLayout(new java.awt.BorderLayout());
+                wrapperCard.setOpaque(false);
+                wrapperCard.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 10, 20));
+                wrapperCard.setMaximumSize(new java.awt.Dimension(1019, 75)); 
+                
+                javax.swing.JPanel rowCard = new javax.swing.JPanel();
+                rowCard.setLayout(new java.awt.BorderLayout(15, 0));
+                rowCard.setBackground(java.awt.Color.WHITE);
+                rowCard.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(220, 235, 230)),
+                    javax.swing.BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                
+                javax.swing.JPanel leftPanel = new javax.swing.JPanel();
+                leftPanel.setLayout(new javax.swing.BoxLayout(leftPanel, javax.swing.BoxLayout.Y_AXIS));
+                leftPanel.setBackground(java.awt.Color.WHITE);
+                
+                javax.swing.JLabel lblNama = new javax.swing.JLabel(log.getNama());
+                lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+                lblNama.setForeground(new java.awt.Color(40, 40, 40));
+                
+                javax.swing.JLabel lblDetail = new javax.swing.JLabel("Tanggal: " + stringTanggal + "   |   Jam: " + jamAbsen);
+                lblDetail.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+                lblDetail.setForeground(java.awt.Color.GRAY);
+                
+                leftPanel.add(lblNama);
+                leftPanel.add(javax.swing.Box.createVerticalStrut(2));
+                leftPanel.add(lblDetail);
+                
+                // MENGGUNAKAN STATUS TERJEMAHAN
+                javax.swing.JLabel lblBadgeStatus = new javax.swing.JLabel("  " + statusTeks.toUpperCase() + "  ");
+                lblBadgeStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 11));
+                lblBadgeStatus.setOpaque(true);
+                lblBadgeStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                
+                if (log.getStatus().equalsIgnoreCase("Pulang")) {
+                    lblBadgeStatus.setBackground(new java.awt.Color(255, 230, 230));
+                    lblBadgeStatus.setForeground(new java.awt.Color(200, 0, 0));
+                } else if (log.getStatus().equalsIgnoreCase("Tidak Hadir")) {
+                    lblBadgeStatus.setBackground(java.awt.Color.LIGHT_GRAY);
+                    lblBadgeStatus.setForeground(java.awt.Color.DARK_GRAY);
+                } else {
+                    lblBadgeStatus.setBackground(new java.awt.Color(230, 245, 235));
+                    lblBadgeStatus.setForeground(new java.awt.Color(0, 130, 40));
+                }
+                
+                rowCard.add(leftPanel, java.awt.BorderLayout.WEST);
+                rowCard.add(lblBadgeStatus, java.awt.BorderLayout.EAST);
+                
+                wrapperCard.add(rowCard, java.awt.BorderLayout.CENTER);
+                jPanel11.add(wrapperCard);
             }
             
-            // 2. Set ringkasan counter statistik ke box atas
-            lblscan.setText(String.valueOf(scanCount));
-            lblhadir.setText(String.valueOf(hadirCount));
-            lblterlambat.setText(String.valueOf(lambatCount));
-            lbltidakhadir.setText(String.valueOf(alpaCount));
+            int totalTinggiPanel = daftarLog.size() * 85; 
+            jPanel11.setPreferredSize(new java.awt.Dimension(jPanel7.getWidth() - 30, totalTinggiPanel));
             
-            // 3. Segarkan tampilan komponen UI secara hierarkis
-            jPanel11.revalidate();
-            jPanel11.repaint();
-            jScrollPane1.revalidate();
-            jScrollPane1.repaint();
-            
-        } catch (Exception e) {
-            System.out.println("Gagal memuat laporan berkala: " + e.getMessage());
-            e.printStackTrace();
+        } else {
+            javax.swing.JPanel emptyCard = new javax.swing.JPanel();
+            emptyCard.setOpaque(false);
+            // MENGGUNAKAN PESAN DINAMIS
+            emptyCard.add(new javax.swing.JLabel(swing.I18nService.get("lbl.rpt.empty"))); 
+            jPanel11.add(emptyCard);
         }
+        
+        lblscan.setText(String.valueOf(scanCount));
+        lblhadir.setText(String.valueOf(hadirCount));
+        lblterlambat.setText(String.valueOf(lambatCount));
+        lbltidakhadir.setText(String.valueOf(alpaCount));
+        
+        jPanel11.revalidate();
+        jPanel11.repaint();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
     }
 }

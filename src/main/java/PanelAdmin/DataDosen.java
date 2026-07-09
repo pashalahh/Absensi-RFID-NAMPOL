@@ -8,8 +8,7 @@ package PanelAdmin;
  *
  * @author ADVAN
  */
-public class DataDosen extends javax.swing.JPanel {
-
+public class DataDosen extends javax.swing.JPanel implements swing.I18nService.I18nChangeListener {
     /**
      * Creates new form DataDosen
      */
@@ -21,9 +20,21 @@ public class DataDosen extends javax.swing.JPanel {
                 jButton12ActionPerformed(evt);
             }
         });
-        
+        swing.I18nService.registerListener(this); // Daftarkan listener
+        onLanguageChanged();
         // Load data dosen pertama kali panel dibuka
         showData("");
+    }
+    public void onLanguageChanged() {
+        jLabel1.setText(swing.I18nService.get("lbl.dsn.title"));
+        jLabel3.setText(swing.I18nService.get("lbl.dsn.nip"));
+        jLabel8.setText(swing.I18nService.get("lbl.dsn.nama"));
+        jLabel4.setText(swing.I18nService.get("lbl.dsn.username"));
+        jLabel6.setText(swing.I18nService.get("lbl.dsn.password"));
+        jButton1.setText(swing.I18nService.get("btn.dsn.refresh"));
+        jButton2.setText(swing.I18nService.get("btn.dsn.update"));
+        jButton12.setText(swing.I18nService.get("btn.dsn.save"));
+        jLabel2.setText(swing.I18nService.get("txt.dsn.search.placeholder"));
     }
 
     /**
@@ -134,6 +145,14 @@ public class DataDosen extends javax.swing.JPanel {
                 jTextField1ActionPerformed(evt);
             }
         });
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField1KeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -174,14 +193,14 @@ public class DataDosen extends javax.swing.JPanel {
                             .addComponent(txtNama, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtNIP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(46, 46, 46)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
+                            .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
                             .addComponent(txtPassw))))
-                .addGap(35, 35, 35)
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -231,6 +250,8 @@ public class DataDosen extends javax.swing.JPanel {
         );
 
         add(jPanel3, java.awt.BorderLayout.PAGE_START);
+
+        jPanel4.setBackground(new java.awt.Color(153, 255, 204));
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -314,6 +335,15 @@ public class DataDosen extends javax.swing.JPanel {
         // TODO add your handling code here:
         showData(jTextField1.getText());
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1KeyTyped
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        // TODO add your handling code here:
+        showData(jTextField1.getText());
+    }//GEN-LAST:event_jTextField1KeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

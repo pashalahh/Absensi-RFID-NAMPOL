@@ -10,7 +10,7 @@ import services.DigitalClockService;
  *
  * @author ADVAN
  */
-public class Absensi extends javax.swing.JPanel {
+public class Absensi extends javax.swing.JPanel implements swing.I18nService.I18nChangeListener {
     Thread clockThread1;
 
     /**
@@ -18,6 +18,8 @@ public class Absensi extends javax.swing.JPanel {
      */
     public Absensi() {
         initComponents();
+        swing.I18nService.registerListener(this);    
+        onLanguageChanged();
         thread1();
         // Atur agar jPanel11 menyusun kartu log secara vertikal ke bawah
         jPanel11.setLayout(new javax.swing.BoxLayout(jPanel11, javax.swing.BoxLayout.Y_AXIS));
@@ -31,6 +33,11 @@ public class Absensi extends javax.swing.JPanel {
                 txtInputRFIDActionPerformed(evt);
             }
         });
+    }
+    public void onLanguageChanged() {
+        jLabel2.setText(swing.I18nService.get("lbl.kiosk.prompt"));
+        jLabel3.setText(swing.I18nService.get("lbl.kiosk.log.title"));
+        btnAutoRefresh.setText(swing.I18nService.get("btn.kiosk.refresh"));
     }
 
     /**
@@ -61,8 +68,9 @@ public class Absensi extends javax.swing.JPanel {
         jPanel1.add(lblRFID, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 120, 100, 120));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Tempel kartu atau ketikan RFID");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 270, -1, -1));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 270, 400, -1));
 
         jPanel2.setBackground(new java.awt.Color(153, 255, 204));
 
@@ -88,7 +96,7 @@ public class Absensi extends javax.swing.JPanel {
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 182, Short.MAX_VALUE)
+            .addGap(0, 123, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -98,7 +106,7 @@ public class Absensi extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 532, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 172, Short.MAX_VALUE)
                 .addComponent(btnAutoRefresh)
                 .addGap(31, 31, 31))
             .addGroup(jPanel2Layout.createSequentialGroup()
@@ -113,12 +121,12 @@ public class Absensi extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAutoRefresh))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(33, 33, 33)
                 .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 350, 860, 240));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 350, 500, 240));
 
         txtInputRFID.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtInputRFID.addActionListener(new java.awt.event.ActionListener() {
@@ -128,9 +136,10 @@ public class Absensi extends javax.swing.JPanel {
         });
         jPanel1.add(txtInputRFID, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 300, 390, -1));
 
+        jLabel1.setBackground(new java.awt.Color(153, 255, 204));
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 30, -1, 30));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 30, -1, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -162,65 +171,69 @@ public class Absensi extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAutoRefreshActionPerformed
 
     private void txtInputRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtInputRFIDActionPerformed
-        String rfidInput = txtInputRFID.getText().trim();
-        if (rfidInput.isEmpty()) return;
+    String rfidInput = txtInputRFID.getText().trim();
+    if (rfidInput.isEmpty()) return;
 
-        try {
-            // 1. Inisialisasi MahasiswaService untuk mencari data mahasiswa
-            services.MahasiswaService mService = new services.MahasiswaService();
-            
-            // Cari data mahasiswa berdasarkan uidRfid mentah (Plain Text seperti di DB)
-            objects.mahasiswa m = mService.cariMahasiswaSpesifikUID(rfidInput);
-            
-            if (m != null) {
-                // 2. Dekripsi data NIM mahasiswa
-                String nimDecrypted = util.EncryptionUtils.decrypt(m.getNimMahasiswa());
-                String namaMahasiswa = m.getNama();
-                
-                // 3. PENETAPAN WAKTU: Cek status kehadiran secara dinamis
-                java.time.LocalTime waktuSekarang = java.time.LocalTime.now();
-                
-                // Aturan waktu operasional (Bisa kamu sesuaikan sendiri jamnya)
-                java.time.LocalTime jamMasuk = java.time.LocalTime.of(8, 0);       // Batas 08:00
-                java.time.LocalTime batasTerlambat = java.time.LocalTime.of(8, 15); // Batas Toleransi 08:15
-                
-                String statusKehadiran = "Tepat Waktu";
-                
-                if (waktuSekarang.isAfter(jamMasuk) && (waktuSekarang.isBefore(batasTerlambat) || waktuSekarang.equals(batasTerlambat))) {
-                    statusKehadiran = "Terlambat";
-                } else if (waktuSekarang.isAfter(batasTerlambat)) {
-                    statusKehadiran = "Terlambat (Sanksi)";
-                }
-                
-                // 4. Tampilkan kartu informasi log di panel hijau UI
-                appendLogAbsensi(rfidInput, namaMahasiswa, nimDecrypted, statusKehadiran);
-                
-                // 5. PROSES SIMPAN KE DATABASE MENGGUNAKAN LOGABSENSISERVICE BAWAANMU
-                services.LogAbsensiService logService = new services.LogAbsensiService();
-                
-                // Ambil waktu tanggal hari ini
-                java.time.LocalDateTime waktuSkrg = java.time.LocalDateTime.now();
-                java.time.LocalDate tanggalSkrg = java.time.LocalDate.now();
-                
-                // Panggil metode bawaanmu. (Kita kirim nimDecrypted atau rfidInput ke parameter hashedUid sesuai kebutuhan pelaporanmu)
-                logService.simpanLog(rfidInput, waktuSkrg, tanggalSkrg, namaMahasiswa, statusKehadiran);
-                
-                System.out.println("Log absensi tersimpan via LogAbsensiService untuk: " + namaMahasiswa);
-                // ======================================================================
-                
-            } else {
-                // Penanganan jika UID RFID tidak terdaftar
-                appendLogAbsensi(rfidInput, "TIDAK DIKENAL", "-----", "Belum Terdaftar");
-            }
-            
-        } catch (Exception e) {
-            System.out.println("Kendala pemrosesan data tap absensi: " + e.getMessage());
-            e.printStackTrace();
-        }
+    // Gunakan I18nService untuk teks default
+    jLabel2.setForeground(java.awt.Color.BLACK);
+    jLabel2.setText(swing.I18nService.get("lbl.kiosk.prompt"));
+
+    try {
+        services.MahasiswaService mService = new services.MahasiswaService();
+        services.LogAbsensiService logService = new services.LogAbsensiService();
+        objects.mahasiswa m = mService.cariMahasiswaSpesifikUID(rfidInput);
         
-        // Kosongkan form teks dan kembalikan fokus kursor
-        txtInputRFID.setText("");
-        txtInputRFID.requestFocus();
+        String modeAbsen = services.LogAbsensiService.getStatusSistemAktif();
+
+        if (m != null) {
+            String nimDecrypted = util.EncryptionUtils.decrypt(m.getNimMahasiswa());
+            
+            // 1. Cek apakah sudah absen
+            if (logService.sudahAbsenHariIni(rfidInput, modeAbsen)) {
+                jLabel2.setForeground(new java.awt.Color(220, 53, 69)); 
+                
+                // Terjemahkan status (Masuk/Pulang) untuk pesan
+                String statusKey = modeAbsen.equalsIgnoreCase("Pulang") ? "status.db.pulang" : "status.db.masuk";
+                String modeTerjemahan = swing.I18nService.get(statusKey).toLowerCase();
+                
+                // Gunakan MessageFormat agar urutan bahasa tetap benar
+                String template = swing.I18nService.get("msg.kiosk.already.scanned");
+                String pesan = java.text.MessageFormat.format(template, m.getNama(), modeTerjemahan);
+                
+                jLabel2.setText(pesan);
+            } else {
+                // Simpan data log
+                logService.simpanLog(rfidInput, java.time.LocalDateTime.now(), java.time.LocalDate.now(), m.getNama(), modeAbsen);
+
+                // Panggil kartu log
+                appendLogAbsensi(rfidInput, m.getNama(), nimDecrypted, m.getKelas(), modeAbsen);
+
+                // Perbaikan: Gunakan I18nService + MessageFormat
+                jLabel2.setForeground(new java.awt.Color(40, 167, 69)); 
+
+                // Ambil template pesan: "Absen {0} berhasil: {1}"
+                String template = swing.I18nService.get("msg.kiosk.success");
+
+                // Terjemahkan status "Masuk"/"Pulang" agar muncul "Vào"/"Ra"
+                String statusKey = modeAbsen.equalsIgnoreCase("Pulang") ? "status.db.pulang" : "status.db.masuk";
+                String modeTerjemahan = swing.I18nService.get(statusKey);
+
+                // Masukkan ke template
+                String pesanSukses = java.text.MessageFormat.format(template, modeTerjemahan, m.getNama());
+                jLabel2.setText(pesanSukses);
+            }
+        } else {
+            // 5. Kartu Tidak Dikenal
+            appendLogAbsensi(rfidInput, "TIDAK DIKENAL", "-----", "-", "Belum Terdaftar");
+            jLabel2.setForeground(java.awt.Color.RED);
+            jLabel2.setText(swing.I18nService.get("msg.kiosk.not.found"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    txtInputRFID.setText("");
+    txtInputRFID.requestFocus();
     }//GEN-LAST:event_txtInputRFIDActionPerformed
 
 
@@ -235,6 +248,8 @@ public class Absensi extends javax.swing.JPanel {
     private javax.swing.JLabel lblRFID;
     private javax.swing.JTextField txtInputRFID;
     // End of variables declaration//GEN-END:variables
+    private swing.SlidingStatusToggle slidingStatusToggle1;
+    
     private void thread1() {
         DigitalClockService service = new DigitalClockService(jLabel1, "EEEE, d MMMM yyyy, HH:mm:ss");
         clockThread1 = service.getThread();
@@ -243,64 +258,86 @@ public class Absensi extends javax.swing.JPanel {
         clockThread1.start();
     }
     
-    public void appendLogAbsensi(String rfid, String nama, String nim, String status) {
-        // 1. Membuat KARTU UTAMA (Card Panel)
-        javax.swing.JPanel cardLog = new javax.swing.JPanel();
-        cardLog.setLayout(new java.awt.GridLayout(1, 4, 10, 0)); // Membagi kartu jadi 4 kolom sejajar
+    public void appendLogAbsensi(String rfid, String nama, String nim, String kelas, String status) {
+    jPanel11.removeAll();
+
+        javax.swing.JPanel cardLog = new javax.swing.JPanel(new java.awt.BorderLayout(15, 0));
         cardLog.setBackground(java.awt.Color.WHITE);
-        
-        // Memberikan margin jarak antar kartu dan outline border tipis membulat (Rounded)
         cardLog.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10), // Jarak luar antar kartu
-                javax.swing.BorderFactory.createCompoundBorder(
-                        javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 1, true), // Border abu tipis
-                        javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15) // Padding dalam kartu
-                )
+                javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 1, true),
+                javax.swing.BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
-        cardLog.setMaximumSize(new java.awt.Dimension(1019, 55)); // Menyesuaikan ukuran jPanel11
+        cardLog.setMaximumSize(new java.awt.Dimension(840, 95)); 
 
-        // 2. Membuat teks informasi waktu & rfid (Kolom 1)
-        java.time.LocalTime now = java.time.LocalTime.now();
-        String waktuAbsen = now.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
-        javax.swing.JLabel lblWaktu = new javax.swing.JLabel("[" + waktuAbsen + "]  RFID: " + rfid);
-        lblWaktu.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 13));
-        lblWaktu.setForeground(java.awt.Color.DARK_GRAY);
+        javax.swing.JLabel lblFotoDefault = new javax.swing.JLabel();
+        lblFotoDefault.setPreferredSize(new java.awt.Dimension(80, 70));
+        lblFotoDefault.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-        // 3. Membuat teks informasi NIM (Kolom 2)
-        javax.swing.JLabel lblNim = new javax.swing.JLabel("NIM: " + nim);
+        try {
+            lblFotoDefault.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/icon/card2.png"))); 
+        } catch (Exception e) {
+            lblFotoDefault.setOpaque(true);
+            lblFotoDefault.setBackground(new java.awt.Color(0, 102, 153)); 
+        }
+        cardLog.add(lblFotoDefault, java.awt.BorderLayout.WEST);
+
+        javax.swing.JPanel pnlInfo = new javax.swing.JPanel();
+        pnlInfo.setBackground(java.awt.Color.WHITE);
+        pnlInfo.setLayout(new javax.swing.BoxLayout(pnlInfo, javax.swing.BoxLayout.Y_AXIS));
+
+        // 1. Label Nama
+        javax.swing.JLabel lblNama = new javax.swing.JLabel(swing.I18nService.get("card.lbl.nama") + " : " + 
+                                    (nama.equals("TIDAK DIKENAL") ? swing.I18nService.get("lbl.prof.unknown") : nama));
+        lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+
+        // 2. Label NIM
+        javax.swing.JLabel lblNim = new javax.swing.JLabel(swing.I18nService.get("card.lbl.nim") + " : " + nim);
         lblNim.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
 
-        // 4. Membuat teks informasi Nama (Kolom 3)
-        javax.swing.JLabel lblNama = new javax.swing.JLabel("Nama: " + nama);
-        lblNama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
+        // 3. Label Kelas (Pastikan mengambil parameter 'kelas')
+        javax.swing.JLabel lblKelas = new javax.swing.JLabel(swing.I18nService.get("card.lbl.kelas") + " : " + 
+                                    (kelas == null || kelas.equals("Belum Terdaftar") ? swing.I18nService.get("status.db.unregistered") : kelas));
+        lblKelas.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
 
-        // 5. Membuat status dengan warna khusus (Kolom 4)
-        javax.swing.JLabel lblStatus = new javax.swing.JLabel(status, javax.swing.SwingConstants.RIGHT);
-        lblStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
-        
-        // Atur warna teks status secara dinamis
-        if (status.equalsIgnoreCase("Terlambat") || status.equalsIgnoreCase("Belum Terdaftar")) {
-            lblStatus.setForeground(java.awt.Color.RED);
+        pnlInfo.add(lblNama);
+        pnlInfo.add(javax.swing.Box.createVerticalStrut(4)); 
+        pnlInfo.add(lblNim);
+        pnlInfo.add(javax.swing.Box.createVerticalStrut(4));
+        pnlInfo.add(lblKelas);
+
+        cardLog.add(pnlInfo, java.awt.BorderLayout.CENTER);
+
+        // 4. Label Status (Pojok Kanan - Terjemahan Dinamis)
+        String statusTranslate = status.equalsIgnoreCase("Pulang") ? 
+                             swing.I18nService.get("status.db.pulang") : 
+                             (status.equalsIgnoreCase("Masuk") ? swing.I18nService.get("status.db.masuk") : status);
+
+        javax.swing.JLabel lblStatus = new javax.swing.JLabel(statusTranslate.toUpperCase(), javax.swing.SwingConstants.RIGHT);
+        lblStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+
+        if (status.equalsIgnoreCase("Pulang")) {
+            lblStatus.setForeground(new java.awt.Color(220, 53, 69)); // Merah
         } else {
-            lblStatus.setForeground(new java.awt.Color(0, 153, 51)); // Hijau sukses
+            lblStatus.setForeground(new java.awt.Color(40, 167, 69)); // Hijau
         }
+        cardLog.add(lblStatus, java.awt.BorderLayout.EAST);
 
-        // 6. Masukkan komponen ke dalam susunan kolom kartu
-        cardLog.add(lblWaktu);
-        cardLog.add(lblNim);
-        cardLog.add(lblNama);
-        cardLog.add(lblStatus);
-
-        // 7. Sisipkan kartu ke urutan teratas (index 0) di jPanel11
-        jPanel11.add(cardLog, 0);
-
-        // Batasi maksimal memuat 3 komponen kartu agar pas di area hijau jPanel11
-        if (jPanel11.getComponentCount() > 3) {
-            jPanel11.remove(jPanel11.getComponentCount() - 1);
-        }
-
-        // Segarkan layout UI
+        jPanel11.add(cardLog);
         jPanel11.revalidate();
         jPanel11.repaint();
+
+        // Timer untuk mereset tampilan
+        javax.swing.Timer timerSembunyi = new javax.swing.Timer(4000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                jPanel11.removeAll();
+                jPanel11.revalidate();
+                jPanel11.repaint();
+                jLabel2.setForeground(java.awt.Color.BLACK);
+                jLabel2.setText(swing.I18nService.get("lbl.kiosk.prompt"));
+            }
+        });
+        timerSembunyi.setRepeats(false); 
+        timerSembunyi.start();
     }
 }
