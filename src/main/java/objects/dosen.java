@@ -4,6 +4,8 @@
  */
 package objects;
 
+import java.time.LocalDateTime;
+
 /**
  *
  * @author LENOVO
@@ -28,19 +30,12 @@ public class dosen {
     @Override
     public String toString() {
         return "dosen{" + 
-                "uidRfid=" + uidRfid + 
                 ", nipDosen=" + nipDosen + 
                 ", nama=" + nama + 
-                ", noTelp=" + noTelp + '}';
+                ", username=" + username +
+                ", password=" + password +'}';
     }
 
-    public String getUidRfid() {
-        return uidRfid;
-    }
-
-    public void setUidRfid(String uidRfid) {
-        this.uidRfid = uidRfid;
-    }
 
     public String getNipDosen() {
         return nipDosen;
@@ -57,15 +52,29 @@ public class dosen {
     public void setNama(String nama) {
         this.nama = nama;
     }
-
-    public String getNoTelp() {
-        return noTelp;
+    
+    public String getUsername() {
+        return username;
     }
 
-    public void setNoTelp(String noTelp) {
-        this.noTelp = noTelp;
+    public void setUsername(String username) {
+        this.username = username;
     }
     
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
     
-    
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
 }
+

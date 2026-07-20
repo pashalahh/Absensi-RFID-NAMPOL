@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @author LENOVO
  */
 public class logabsensi {
-    private int idLog;
+    private String idLog;
     private String uidRfid;
 
     private LocalDateTime waktu;
@@ -24,7 +24,7 @@ public class logabsensi {
     }
 
 
-    public logabsensi(int idLog, String uidRfid, LocalDateTime waktu, LocalDate tanggal, String nama, String status) {
+    public logabsensi(String idLog, String uidRfid, LocalDateTime waktu, LocalDate tanggal, String nama, String status) {
 
         this.idLog = idLog;
         this.uidRfid = uidRfid;
@@ -47,11 +47,11 @@ public class logabsensi {
     }
 
     // Getter & Setter
-    public int getIdLog() {
+    public String getIdLog() {
         return idLog;
     }
 
-    public void setIdLog(int idLog) {
+    public void setIdLog(String idLog) {
         this.idLog = idLog;
     }
 
