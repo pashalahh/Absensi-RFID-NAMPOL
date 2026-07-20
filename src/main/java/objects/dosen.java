@@ -12,21 +12,19 @@ import java.time.LocalDateTime;
  */
 public class dosen {
     
+    private String uidRfid;
     private String nipDosen;
     private String nama;
-    private String username;
-    private String password;
-    private LocalDateTime lastLogin;
+    private String noTelp;
     
     public dosen (){
     }
 
-    public dosen(String nipDosen, String nama, String username, String password, LocalDateTime lastLogin) {
+    public dosen(String uidRfid, String nipDosen, String nama, String noTelp) {
+        this.uidRfid = uidRfid;
         this.nipDosen = nipDosen;
         this.nama = nama;
-        this.username = username;
-        this.password= password;
-        this.lastLogin = lastLogin;
+        this.noTelp = noTelp;
     }
 
     @Override
